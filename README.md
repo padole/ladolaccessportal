@@ -1,4 +1,4 @@
-# Access Portal Web Application
+# Access Request Portal Web Application
 
 This is a Flask-based web application for managing user and admin access portals. It includes user registration, login, password management, and request handling features.
 
@@ -75,6 +75,4 @@ The app will be available at `http://localhost:8082`.
 - Use database migrations to keep the schema up to date.
 - Consider adding a `Procfile` or `Dockerfile` for deployment on platforms like Heroku or Docker containers.
 
-## License
 
-This project is licensed under the MIT License.
