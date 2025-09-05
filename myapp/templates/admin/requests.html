@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Admin - Dashboard</title>
+
+    <!-- Custom fonts for this template-->
+    <link href="/static/assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="/static/assets/css/admin2.css" rel="stylesheet">
+
+</head>
+
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+            <!-- Sidebar - Brand -->
+            <a class="navbar-brand" id="logo" href="{{url_for('admin_dashboard')}}"><img src="/static/images/ladol.png" class="img-fluid" id="logo" alt=""></a>
+
+            <!-- <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{url_for('home')}}">
+                <h6 class="sitename">Sisiana's <span id="description-title">Treat</span></h6> 
+            </a> -->
+
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
+
+            <!-- Nav Item - Dashboard -->
+            <li class="nav-item active">
+                <a class="nav-link" href="{{url_for('admin_dashboard')}}">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Dashboard</span></a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+
+            <!-- Divider -->
+           
+
+            <li class="nav-item active">
+                <a class="nav-link" href="{{url_for('admin_requests')}}">
+                    <i class="fas fa-fw fa-list"></i>
+                    <span>All Requests</span></a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+            <li class="nav-item active">
+                <a class="nav-link" href="{{url_for('admin_users')}}">
+                    <i class="fas fa-fw fa-users"></i>
+                    <span>Users</span></a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Settings Dropdown -->
+            <li class="nav-item active">
+            <a class="nav-link dropdown-toggle" data-bs-toggle="collapse" href="#settingsDropdown" role="button" aria-expanded="false" aria-controls="settingsDropdown">
+                <i class="fas fa-fw fa-cog"></i>
+                <span>Settings</span></a>
+            </a>
+            <div class="collapse" id="settingsDropdown">
+                <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ms-3">
+                <li>
+                    <a href="{{url_for('admin_change_password')}}" class="nav-link">
+                    <i class="fas fa-fw fa-lock"></i>
+                    <span>Change Password</span> 
+                    </a>
+                </li>
+                
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+                <li>
+                    <a href="{{(url_for('admin_logout'))}}" class="nav-link text-white">
+                    <i class="fas fa-fw fa-power-off"></i>
+                    <span>Logout</span> 
+                    </a>
+                </li>
+                </ul>
+            </div>
+            </li>
+
+        </ul>
+        <!-- End of Sidebar -->
+
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+
+            <!-- Main Content -->
+            <div id="content">
+
+                <!-- Topbar -->
+                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+                    <!-- Sidebar Toggle (Topbar) -->
+                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                        <i class="fa fa-bars"></i>
+                    </button>
+
+                    <!-- Topbar Search -->
+                    <form
+                        class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                        <div class="input-group">
+                            <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
+                                aria-label="Search" name="search_query" value="{{ search_query }}" aria-describedby="basic-addon2">
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" type="submit">
+                                    <i class="fas fa-search fa-sm"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </nav>
+
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+                              <div class="mb-3">
+                                {% with messages = get_flashed_messages(with_categories=true) %}
+                                {% if messages %}
+                                {% for category, message in messages %}
+                                <div class="alert d-flex justify-content-center col-md-6 alert-{{ category }}">{{ message }}</div>
+                                {% endfor %}
+                                {% endif %}
+                                {% endwith %}
+                            </div>
+                    <!-- Page Heading -->
+                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                        <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
+                    <form method="GET" action="{{ url_for('admin_requests') }}" class="mt-3">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label for="status_filter" class="fw-bold text-dark">Filter Request:</label>
+                            <select name="status_filter" id="status_filter" class="form-control">
+                                <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All</option>
+                                <option value="PENDING" {% if status_filter == 'PENDING' %}selected{% endif %}>Pending</option>
+                                <option value="APPROVED" {% if status_filter == 'APPROVED' %}selected{% endif %}>Approved</option>
+                                <option value="REJECTED" {% if status_filter == 'REJECTED' %}selected{% endif %}>Rejected</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="search_query" class="fw-bold text-dark">Search:</label>
+                            <input type="text" name="search_query" id="search_query" class="form-control" placeholder="Search for..." value="{{ search_query }}">
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary">Apply Filter</button>
+                        </div>
+                    </div>
+                </form>
+                    </div>
+
+                    <div></div>
+
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-dark">Access Request List</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>S/N</th>
+                                            <th>Fullname</th>
+                                            <th>Company</th>
+                                            <th>Job role</th>
+                                            <th>Expected Date</th>
+                                            <th>Departure Date</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for request in requests.items %}
+                                        <tr>
+                                            <td>{{ (requests.page - 1) * requests.per_page + loop.index }}</td>
+                                            <td>{{request.fullname}}</td>
+                                            <td>{{request.company}}</td>
+                                            <td>{{request.job_role}}</td>
+                                            <td>{{request.expected_date}}</td>
+                                            <td>{{request.departure_date}}</td>
+                                            <td>
+                                                <span class="badge text-light
+                                                    {% if request.status.name == 'APPROVED' %} bg-success
+                                                    {% elif request.status.name == 'REJECTED' %} bg-danger
+                                                    {% else %} bg-warning text-dark
+                                                    {% endif %}">
+                                                    {{ request.status.value|capitalize }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <a href="{{url_for('admin_request_details', request_id=request.request_id)}}" class="btn btn-sm btn-primary">
+                                                        <i class="fas fa-eye"></i> View
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pagination -->
+                    <nav aria-label="Page navigation" class="mt-3">
+                        <ul class="pagination justify-content-center">
+                            {% if requests.has_prev %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('admin_requests', page=requests.prev_num, status_filter=status_filter, search_query=search_query) }}">Previous</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link">Previous</span>
+                                </li>
+                            {% endif %}
+
+                            {% for page_num in requests.iter_pages() %}
+                                {% if page_num %}
+                                    {% if requests.page == page_num %}
+                                        <li class="page-item active">
+                                            <span class="page-link">{{ page_num }}</span>
+                                        </li>
+                                    {% else %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="{{ url_for('admin_requests', page=page_num, status_filter=status_filter, search_query=search_query) }}">{{ page_num }}</a>
+                                        </li>
+                                    {% endif %}
+                                {% else %}
+                                    <li class="page-item disabled">
+                                        <span class="page-link">...</span>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if requests.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('admin_requests', page=requests.next_num, status_filter=status_filter, search_query=search_query) }}">Next</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link">Next</span>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+        
+                </div>
+                <!-- /.container-fluid -->
+
+            </div>
+            <!-- End of Main Content -->
+
+            <!-- Footer -->
+            <footer class="sticky-footer bg-white">
+                <div class="container my-auto">
+                    <div class="copyright text-center my-auto">
+                        <p>&copy; <span>Copyright</span> <strong class="px-1 sitename">Ladol</strong> <span>All Rights Reserved</span></p>
+                    </div>
+                </div>
+            </footer>
+            <!-- End of Footer -->
+
+        </div>
+        <!-- End of Content Wrapper -->
+
+    </div>
+    <!-- End of Page Wrapper -->
+
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+    <!-- Logout Modal-->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <a class="btn btn-primary" href="login.html">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="/static/assets/vendor/jquery/jquery.min.js"></script>
+    <script src="/static/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="/static/assets/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="/static/assets/js/sb-admin-2.min.js"></script>
+
+</body>
+
+</html>

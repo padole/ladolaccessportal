@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Employee Onboarding System</title>
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="/static/fonts/css/all.css">
+    <link rel="stylesheet" href="/static/css/admin.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Karla:ital,wght@0,200..800;1,200..800&family=Madimi+One&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
+
+</head>
+<body>
+        <div class="wrapper">
+            <aside id="sidebar">
+                <div class="h-100">
+                    <div class="sidebar-logo my-4">
+                        <a class="navbar-brand" id="logo" href="{{url_for('home')}}">Dip <strong class="logo-text text-light">TEK</strong></a>
+                    </div>
+                    <hr class="sidebar-divider my-0">
+                    <ul class="sidebar-nav">
+                        <li class="sidebar-item my-3">
+                            <a href="{{url_for('admin_dashboard')}}" class="sidebar-link" >
+                                <i class="fa-solid fa-sliders pe-2"></i>
+                                Dashboard
+                            </a>
+                            
+                        </li>
+                        <hr class="sidebar-divider my-0">
+                        <li class="sidebar-item my-3">
+                            <a href="#" class="sidebar-link">
+                                <i class="fa-solid fa-sliders pe-2"></i>
+                                Task
+                            </a>
+                        </li>
+                        <hr class="sidebar-divider my-0">
+                        <li class="sidebar-item my-3">
+                            <a href="{{url_for('admin_users')}}" class="sidebar-link" >
+                                <i class="fa-solid fa-sliders pe-2"></i>
+                                Users
+                            </a>
+                            
+                        </li>
+                    </ul>
+                </div>
+            </aside>
+    
+            <div class="main">
+                <nav class="navbar navbar-expand px-3 border-bottom d-flex justify-content-between">
+        
+                    <button class="btn btn-success" type="button" data-bs-theme="dark">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <form
+                            class="d-none d-sm-inline-block form-inline navbar-search">
+                            <div class="input-group">
+                                <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
+                                    aria-label="Search" aria-describedby="basic-addon2">
+                                <div class="input-group-append">
+                                    <button class="btn btn-search" type="button">
+                                        <i class="fas fa-search fa-sm"></i>
+                                    </button>
+                                </div>
+                            </div>
+                    </form>
+                        <div class="d-flex ">
+                          
+                              <a class="nav-link" href="#" id="userDropdown" >
+                                        <span class="d-none d-lg-inline text-gray-600 small">Adole Peter</span>
+                                        <img class="img-profile rounded-circle img-fluid" id="profile-img"
+                                            src="/static/images/undraw_profile.svg">
+                             </a>
+                        </div>
+                </nav>
+
+
+<div class="container mt-5">
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">Request Details</h4>
+            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-light btn-sm">Back to Dashboard</a>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">Full Name:</dt>
+                <dd class="col-sm-9">{{ request.fullname }}</dd>
+
+                <dt class="col-sm-3">Company:</dt>
+                <dd class="col-sm-9">{{ request.company }}</dd>
+
+                <dt class="col-sm-3">Job Role:</dt>
+                <dd class="col-sm-9">{{ request.job_role }}</dd>
+
+                <dt class="col-sm-3">Email:</dt>
+                <dd class="col-sm-9">{{ request.email_address }}</dd>
+
+                <dt class="col-sm-3">Phone:</dt>
+                <dd class="col-sm-9">{{ request.phone_number }}</dd>
+
+                <dt class="col-sm-3">ID Card Type:</dt>
+                <dd class="col-sm-9">{{ request.id_card.value|capitalize }}</dd>
+
+                <dt class="col-sm-3">Expected Date:</dt>
+                <dd class="col-sm-9">{{ request.expected_date.strftime('%Y-%m-%d') }}</dd>
+
+                <dt class="col-sm-3">Departure Date:</dt>
+                <dd class="col-sm-9">{{ request.departure_date.strftime('%Y-%m-%d') }}</dd>
+
+                <dt class="col-sm-3">Duration:</dt>
+                <dd class="col-sm-9">{{ request.duration }}</dd>
+
+                <dt class="col-sm-3">Location:</dt>
+                <dd class="col-sm-9">{{ request.location }}</dd>
+
+                <dt class="col-sm-3">Purpose:</dt>
+                <dd class="col-sm-9">{{ request.purpose }}</dd>
+
+                <dt class="col-sm-3">Status:</dt>
+                <dd class="col-sm-9">
+                    <span class="badge 
+                        {% if request.status.name == 'APPROVED' %} bg-success 
+                        {% elif request.status.name == 'REJECTED' %} bg-danger 
+                        {% else %} bg-warning text-dark 
+                        {% endif %}">
+                        {{ request.status.value|capitalize }}
+                    </span>
+                </dd>
+                {% if request.document %}
+                <dt>Attached Document:<dd>
+                    <a href="{{ url_for('static', filename='uploads/' + request.document) }}" class="btn btn-outline-info" download>
+                     Download Document
+                    </a></dd></dt>
+
+                {% else %}
+                <p>No document uploaded.</p>
+                {% endif %}
+            </dl>
+
+            <hr>
+
+            <h5>Update Request Status</h5>
+            <form method="POST" action="{{ url_for('admin_request_details', request_id=request.request_id) }}">
+                {{ form.hidden_tag() }}
+                <div class="d-flex gap-2">
+                    <button type="submit" name="status" value="APPROVED" class="btn btn-success">Approve</button>
+                    <button type="submit" name="status" value="REJECTED" class="btn btn-danger">Reject</button>
+                    <!-- <button type="submit" name="status" value="PENDING" class="btn btn-warning text-dark">Mark Pending</button> -->
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+               {#<!-- <div class=" row mt-4 mx-3">
+                <h2>Request Details</h2>
+
+                        <ul>
+                            <li><strong>Full Name:</strong> {{ request.fullname }}</li>
+                            <li><strong>Company:</strong> {{ request.company }}</li>
+                            <li><strong>Job Role:</strong> {{ request.job_role }}</li>
+                            <li><strong>Email:</strong> {{ request.email_address }}</li>
+                            <li><strong>Phone:</strong> {{ request.phone_number }}</li>
+                            <li><strong>ID Card Type:</strong> {{ request.id_card.value }}</li>
+                            <li><strong>Expected Date:</strong> {{ request.expected_date.strftime('%Y-%m-%d') }}</li>
+                            <li><strong>Departure Date:</strong> {{ request.departure_date.strftime('%Y-%m-%d') }}</li>
+                            <li><strong>Duration:</strong> {{ request.duration }}</li>
+                            <li><strong>Location:</strong> {{ request.location }}</li>
+                            <li><strong>Purpose:</strong> {{ request.purpose }}</li>
+                            <li><strong>Approval Status:</strong> {{ request.status.value }}</li>
+                        </ul>
+
+                        <form method="POST" action="{{ url_for('admin_request_details', request_id=request.request_id) }}">
+                            {{ form.hidden_tag() }}
+                            <button type="submit" name="status" value="APPROVED" class="btn btn-success">Approve</button>
+                            <button type="submit" name="status" value="REJECTED" class="btn btn-danger">Reject</button>
+                            <button type="submit" name="status" value="PENDING" class="btn btn-warning">Mark Pending</button>
+                        </form>
+
+                        <a href="{{ url_for('admin_dashboard') }}">Back to Dashboard</a>
+
+
+               </div>           -->#}
+            </div>
+        </div>  
+    <script src="/static/bootstrap/js/bootstrap.bundle.js"></script> 
+    <script src="/static/js/main2.js"></script>   
+    <script src="/static/jquery/main.js"></script>
+    
+</body>
+</html>

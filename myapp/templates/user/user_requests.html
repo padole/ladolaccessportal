@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>User - Dashboard</title>
+
+    <!-- Custom fonts for this template-->
+    <link href="/static/assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="/static/assets/css/admin2.css" rel="stylesheet">
+
+</head>
+
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+            <!-- Sidebar - Brand -->
+            <a class="navbar-brand" id="logo" href="{{url_for('admin_dashboard')}}"><img src="/static/images/ladol.png" class="img-fluid" id="logo" alt=""></a>
+
+            <!-- <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{url_for('home')}}">
+                <h6 class="sitename">Sisiana's <span id="description-title">Treat</span></h6> 
+            </a> -->
+
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
+
+            <!-- Nav Item - Dashboard -->
+            <li class="nav-item active">
+                <a class="nav-link" href="{{url_for('dashboard')}}">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Dashboard</span></a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+
+            <!-- Divider -->
+           
+
+            <li class="nav-item active">
+                <a class="nav-link" href="{{url_for('user_request')}}">
+                    <i class="fas fa-fw fa-list"></i>
+                    <span>My Requests</span></a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+            <li class="nav-item active">
+                <a class="nav-link" href="{{url_for('new_request')}}">
+                    <i class="fas fa-fw fa-plus"></i>
+                    <span>Create New Request</span></a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+            
+            <!-- Settings Dropdown -->
+            <li class="nav-item active">
+            <a class="nav-link dropdown-toggle" data-bs-toggle="collapse" href="#settingsDropdown" role="button" aria-expanded="false" aria-controls="settingsDropdown">
+                <i class="fas fa-fw fa-cog"></i>
+                <span>Settings</span></a>
+            </a>
+            <div class="collapse" id="settingsDropdown">
+                <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ms-3">
+                <li>
+                    <a href="{{url_for('change_password')}}" class="nav-link">
+                    <i class="fas fa-fw fa-lock"></i>
+                    <span>Change Password</span> 
+                    </a>
+                </li>
+                   <!-- Divider -->
+                <hr class="sidebar-divider">
+                <li>
+                    <a href="{{url_for('logout')}}" class="nav-link text-white">
+                    <i class="fas fa-fw fa-power-off"></i>
+                    <span>Logout</span> 
+                    </a>
+                </li>
+                </ul>
+            </div>
+            </li>
+
+               <!-- Divider -->
+            <hr class="sidebar-divider">
+
+        </ul>
+        <!-- End of Sidebar -->
+
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+
+            <!-- Main Content -->
+            <div id="content">
+
+                <!-- Topbar -->
+                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+                    <!-- Sidebar Toggle (Topbar) -->
+                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                        <i class="fa fa-bars"></i>
+                    </button>
+
+                    <!-- Topbar Search -->
+                    <form
+                        class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                        <div class="input-group">
+                            <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
+                                aria-label="Search" aria-describedby="basic-addon2">
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" type="button">
+                                    <i class="fas fa-search fa-sm"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="text-dark font-weight-bold mx-2">
+                        {% if deets %} 
+                        Hi {{deets.user_fname}} 
+                        {% endif %}
+                    </div>
+                </nav>
+
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+
+                    <div class="mb-3">
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                        {% for category, message in messages %}
+                        <div class="alert d-flex justify-content-center col-md-6 alert-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                        {% endif %}
+                        {% endwith %}
+                    </div>
+
+                    <!-- Page Heading -->
+                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                        <h1 class="h3 mb-0 text-gray-800">Access Requests</h1>
+                        <a href="{{url_for('new_request')}}" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm"><i
+                                class="fas fa-plus fa-sm text-white-50"></i> Create New Request</a>
+                    </div>
+
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-dark">My Request List</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                    <thead class="text-dark">
+                                        <tr>
+                                            <th>S/N</th>
+                                            <th>Fullname</th>
+                                            <th>Company</th>
+                                            <th>Job role</th>
+                                            <th>Expected Date</th>
+                                            <th>Departure Date</th>
+                                            <th>Status</th>
+                                            
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for request in requests %}
+                                        <tr>
+                                            <td>{{ loop.index }}</td>
+                                            <td>{{request.fullname}}</td>
+                                            <td>{{request.company}}</td>
+                                            <td>{{request.job_role}}</td>
+                                            <td>{{request.expected_date}}</td>
+                                            <td>{{request.departure_date}}</td>
+                                            <td>
+                                                <span class="badge text-light
+                                                    {% if request.status.name == 'APPROVED' %} bg-success 
+                                                    {% elif request.status.name == 'REJECTED' %} bg-danger 
+                                                    {% else %} bg-warning text-dark 
+                                                    {% endif %}">
+                                                    {{ request.status.value|capitalize }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if pagination %}
+                    <div class="d-flex justify-content-center">
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination">
+                                {% if pagination.has_prev %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('user_request', page=pagination.prev_num) }}" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                                {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link">&laquo;</span>
+                                </li>
+                                {% endif %}
+
+                                {% for page_num in pagination.iter_pages() %}
+                                    {% if page_num %}
+                                        {% if page_num == pagination.page %}
+                                        <li class="page-item active">
+                                            <span class="page-link">{{ page_num }}</span>
+                                        </li>
+                                        {% else %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="{{ url_for('user_request', page=page_num) }}">{{ page_num }}</a>
+                                        </li>
+                                        {% endif %}
+                                    {% else %}
+                                        <li class="page-item disabled">
+                                            <span class="page-link">...</span>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% if pagination.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('user_request', page=pagination.next_num) }}" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                                {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link">&raquo;</span>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+                    {% endif %}
+
+                </div>
+                <!-- /.container-fluid -->
+
+            </div>
+            <!-- End of Main Content -->
+
+            <!-- Footer -->
+            <footer class="sticky-footer bg-white">
+                <div class="container my-auto">
+                    <div class="copyright text-center my-auto">
+                        <p>&copy; <span>Copyright</span> <strong class="px-1 sitename">Ladol</strong> <span>All Rights Reserved</span></p>
+                    </div>
+                </div>
+            </footer>
+            <!-- End of Footer -->
+
+        </div>
+        <!-- End of Content Wrapper -->
+
+    </div>
+    <!-- End of Page Wrapper -->
+
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+    <!-- Logout Modal-->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <a class="btn btn-primary" href="login.html">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="/static/assets/vendor/jquery/jquery.min.js"></script>
+    <script src="/static/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="/static/assets/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="/static/assets/js/sb-admin-2.min.js"></script>
+
+</body>
+
+</html>
