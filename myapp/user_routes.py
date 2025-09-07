@@ -108,7 +108,6 @@ def register():
         except Exception as e:
             db.session.rollback()
             flash('An error occurred during registration. Please try again.', 'danger')
-            print(f"Registration error: {str(e)}")  # Log the error for debugging
             return redirect(url_for('register'))
 
     return render_template('user/register.html', form=form)

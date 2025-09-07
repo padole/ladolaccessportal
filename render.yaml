@@ -1,0 +1,38 @@
+services:
+  - type: web
+    name: ladol-access-portal
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --bind 0.0.0.0:$PORT myapp:app
+    releaseCommand: flask db upgrade
+    envVars:
+      - key: FLASK_APP
+        value: myapp
+      - key: FLASK_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ladol-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: MAIL_SERVER
+        value: smtp.office365.com
+      - key: MAIL_PORT
+        value: 587
+      - key: MAIL_USE_TLS
+        value: true
+      - key: MAIL_USERNAME
+        value: meetings@ladol.com
+      - key: MAIL_PASSWORD
+        value: Kah37418
+      - key: MAIL_DEFAULT_SENDER
+        value: Ladol Access Portal <meetings@ladol.com>
+      - key: MAIL_ADMIN
+        value: meetings@ladol.com
+
+databases:
+  - name: ladol-db
+    databaseName: ladolaccessportal
+    user: ladoluser
+    plan: free
