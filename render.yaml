@@ -7,13 +7,11 @@ services:
     releaseCommand: flask db upgrade
     envVars:
       - key: FLASK_APP
-        value: myapp
+        value: app.py
       - key: FLASK_ENV
         value: production
       - key: DATABASE_URL
-        fromDatabase:
-          name: ladol-db
-          property: connectionString
+        sync: false  # Set this to your Render PostgreSQL database URL
       - key: SECRET_KEY
         generateValue: true
       - key: MAIL_SERVER
@@ -30,9 +28,3 @@ services:
         value: Ladol Access Portal <meetings@ladol.com>
       - key: MAIL_ADMIN
         value: meetings@ladol.com
-
-databases:
-  - name: ladol-db
-    databaseName: ladolaccessportal
-    user: ladoluser
-    plan: free

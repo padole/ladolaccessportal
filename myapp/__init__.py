@@ -16,10 +16,9 @@ def create_app():
 
     # Database configuration
     database_url = os.environ.get("DATABASE_URL")
-    if database_url:
-        app.config['SQLALCHEMY_DATABASE_URI'] = database_url
-    else:
-        app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql+psycopg2://postgres:1234@localhost/ladolaccessportal"
+    if not database_url:
+        raise ValueError("DATABASE_URL environment variable is required but not set.")
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     # Flask configuration
