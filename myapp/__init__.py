@@ -33,6 +33,10 @@ def create_app():
     app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER', 'Ladol Access Portal <meetings@ladol.com>')
     app.config['MAIL_ADMIN'] = os.environ.get('MAIL_ADMIN', 'meetings@ladol.com')
 
+    # In myapp/__init__.py, temporarily add this for debugging:
+    print(f"DATABASE_URL: {os.environ.get('DATABASE_URL', 'NOT SET')}")
+
+
     # app.config.from_object(config.TestConfig)# Load config from class
     mail.init_app(app)
     csrf.init_app(app)
