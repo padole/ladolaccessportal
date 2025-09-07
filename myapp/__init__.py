@@ -1,3 +1,4 @@
+import os
 from flask import Flask
 from flask_login import LoginManager
 from flask_wtf import CSRFProtect
@@ -10,7 +11,8 @@ login_manager = LoginManager()
 
 def create_app():
     from myapp.models import db, User, Admin # Import the db instance from SQLALCHEMY
-    app = Flask(__name__,instance_relative_config=True) # Load config from instance folder
+    template_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'templates'))
+    app = Flask(__name__, template_folder=template_dir, instance_relative_config=True) # Load config from instance folder
     app.config['MAIL_SERVER'] = 'smtp.gmail.com'  # or your SMTP server
     app.config['MAIL_PORT'] = 587
     app.config['MAIL_USE_TLS'] = True
@@ -19,8 +21,6 @@ def create_app():
     app.config['MAIL_DEFAULT_SENDER'] = ('Ladol Access', 'inas4wealth@gmail.com')
     app.config.from_pyfile('config.py')
     
-    
-
     # app.config.from_object(config.TestConfig)# Load config from class
     mail.init_app(app)
     csrf.init_app(app)
@@ -38,6 +38,4 @@ def create_app():
 
 app=create_app()
 
-
 from myapp import user_routes,myforms,admin_routes
-

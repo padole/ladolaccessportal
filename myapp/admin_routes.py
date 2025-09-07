@@ -1,3 +1,4 @@
+import json
 from flask import render_template,request,redirect,flash,redirect,url_for,session,make_response
 from functools import wraps
 from werkzeug.security import generate_password_hash,check_password_hash
@@ -69,7 +70,7 @@ def admin_requests():
     date_filter = request.args.get('date_filter') or ''
     search_query = request.args.get('search_query') or ''
     page = request.args.get('page', 1, type=int)
-    query = UserRequest.query
+    query = UserRequest.query.options(db.joinedload(UserRequest.user)).join(User)
     if status_filter and status_filter != 'all' and status_filter in ApprovalStatusEnum.__members__:
         query = query.filter(UserRequest.status == ApprovalStatusEnum[status_filter])
     if search_query:
@@ -77,7 +78,9 @@ def admin_requests():
             db.or_(
                 UserRequest.fullname.ilike(f'%{search_query}%'),
                 UserRequest.company.ilike(f'%{search_query}%'),
-                UserRequest.job_role.ilike(f'%{search_query}%')
+                UserRequest.job_role.ilike(f'%{search_query}%'),
+                User.user_fname.ilike(f'%{search_query}%'),
+                User.user_lname.ilike(f'%{search_query}%')
             )
         )
     # if date_filter:
@@ -109,7 +112,8 @@ def admin_request_details(request_id):
             return redirect(url_for('admin_dashboard'))
         else:
             flash('Invalid status update', 'danger')
-    return render_template('admin/request_details.html',request=req, form=form,)
+    documents = json.loads(req.document) if req.document else []
+    return render_template('admin/request_details.html',request=req, form=form, documents=documents)
 
         
 

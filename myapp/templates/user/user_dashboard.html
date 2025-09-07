@@ -10,14 +10,13 @@
           <meta name="description" content="">
               <meta name="author" content="">
                   <title>User - Dashboard</title>
+                  <link rel="icon" type="image/png" href="/static/assets/images/ladolsymbol.png">
                       <link href="/static/assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
                           <link
                                   href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
                                           rel="stylesheet">
                                               <link href="/static/assets/css/admin2.css" rel="stylesheet">
-                                              </head>>
-
-
+</head>
 
 <body id="page-top">
 
@@ -26,7 +25,7 @@
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
             <!-- Sidebar - Brand -->
-            <a class="navbar-brand" id="logo" href="{{url_for('home')}}"><img src="/static/images/ladol.png" class="img-fluid" id="logo" alt=""></a>
+            <a class="navbar-brand" id="logo" href="{{url_for('home')}}"><img src="/static/assets/images/ladol.png" class="img-fluid" id="logo" alt=""></a>
 
             <!-- <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{url_for('home')}}">
                 <h6 class="sitename">Sisiana's <span id="description-title">Treat</span></h6> 
@@ -130,7 +129,7 @@
             {% endwith %}
           </div>
           <div class="d-sm-flex align-items-center justify-content-between mb-4">
-            <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
+            <h1 class="h3 mb-0 text-gray-800">User Dashboard</h1>
             <a href="{{url_for('new_request')}}" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm">
               <i class="fas fa-plus fa-sm text-white-50"></i> Create New Request
             </a>
@@ -201,21 +200,47 @@
               </div>
             </div>
           </div>
-        </div>
-      </div>
-      <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-              <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">×</span>
-              </button>
-            </div>
-            <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
-            <div class="modal-footer">
-              <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-              <a class="btn btn-primary" href="{{ url_for('admin_logout') }}">Logout</a>
+
+          <!-- Pending Requests Table -->
+          <div class="row mt-5">
+            <div class="col-xl-12 col-md-12 mb-4">
+              <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                  <h6 class="m-0 font-weight-bold text-dark">Pending Requests</h6>
+                </div>
+                <div class="card-body">
+                  <div class="table-responsive">
+                    <table class="table table-bordered" id="pendingTable" width="100%" cellspacing="0">
+                      <thead class="text-dark">
+                        <tr>
+                          <th>S/N</th>
+                          <th>Fullname</th>
+                          <th>Company</th>
+                          <th>Job role</th>
+                          <th>Expected Date</th>
+                          <th>Departure Date</th>
+                          <th>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for request in pending_requests_list %}
+                        <tr>
+                          <td>{{ loop.index }}</td>
+                          <td>{{ request.fullname }}</td>
+                          <td>{{ request.company }}</td>
+                          <td>{{ request.job_role }}</td>
+                          <td>{{ request.expected_date }}</td>
+                          <td>{{ request.departure_date }}</td>
+                          <td>
+                            <span class="badge bg-warning text-dark">Pending</span>
+                          </td>
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

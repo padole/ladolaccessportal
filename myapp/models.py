@@ -9,9 +9,9 @@ db = SQLAlchemy()
 
 
 class IDCardEnum(Enum):
-    vistor = 'vistor ID'
-    parmanent = 'parmanent ID'
-    not_applicable = 'not applicable'
+    visitor = 'visitor'
+    permanent = 'permanent'
+    not_applicable = 'not_applicable'
 
 
 class ApprovalStatusEnum(Enum):
@@ -23,6 +23,7 @@ class ApprovalStatusEnum(Enum):
 
 
 class User(UserMixin, db.Model):
+    __tablename__ = 'users'
     user_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_fname = db.Column(db.String(100), nullable=False)
     user_lname = db.Column(db.String(100), nullable=False)
@@ -52,14 +53,14 @@ class UserRequest(db.Model):
     job_role = db.Column(db.String(200), nullable=False)
     email_address = db.Column(db.String(100), nullable=False)
     phone_number = db.Column(db.String(100), nullable=False)
-    id_card = db.Column(db.Enum(IDCardEnum), default=IDCardEnum.vistor)
+    id_card = db.Column(db.Enum(IDCardEnum), default=IDCardEnum.visitor)
     expected_date = db.Column(db.Date)
     departure_date = db.Column(db.Date)
     duration = db.Column(db.String(50), nullable=False)
     location = db.Column(db.String(200), nullable=False)
     purpose =  db.Column(db.String(250), nullable=False)
     status = db.Column(db.Enum(ApprovalStatusEnum), default=ApprovalStatusEnum.PENDING)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
     user = db.relationship('User', backref='requests')
     document = db.Column(db.String(255))
 

@@ -1,4 +1,5 @@
 import os
+import json
 from werkzeug.utils import secure_filename
 from functools import wraps
 from flask import render_template,request,redirect,flash,redirect,url_for,session,make_response
@@ -79,33 +80,38 @@ def get_started():
 
 @app.route('/register/',methods=['GET','POST'])
 def register():
-    if request.method == 'POST':
-        fname = request.form.get('fname')
-        lname = request.form.get('lname')
-        email = request.form.get('email')
-        phone = request.form.get('phone')
-        password = request.form.get('password')
-        confirm_password = request.form.get('confirm_password')
+    form = myforms.RegistrationForm()
+    if request.method == 'POST' and form.validate_on_submit():
+        fname = form.fname.data
+        lname = form.lname.data
+        email = form.email.data
+        phone = form.phone.data
+        password = form.password.data
 
-        # Validate required fields
-        if not all([fname, lname, email, phone, password, confirm_password]):
-            flash('All fields are required.', 'danger')
+        try:
+            # Check if email already exists
+            if User.query.filter_by(user_email=email).first():
+                flash('Email already registered', 'danger')
+                return redirect(url_for('register'))
+
+            # Create new user
+            user = User(user_fname=fname, user_lname=lname, user_email=email, user_phone=phone)
+            user.set_password(password)
+
+            # Add to database
+            db.session.add(user)
+            db.session.commit()
+
+            flash('Registration successful. Please log in.', 'success')
+            return redirect(url_for('login'))
+
+        except Exception as e:
+            db.session.rollback()
+            flash('An error occurred during registration. Please try again.', 'danger')
+            print(f"Registration error: {str(e)}")  # Log the error for debugging
             return redirect(url_for('register'))
 
-        if password != confirm_password:
-            flash('Passwords do not match.', 'danger')
-            return redirect(url_for('register'))
-
-        if User.query.filter_by(user_email=email).first():
-            flash('Email already registered')
-            return redirect(url_for('register'))
-
-        user = User(user_fname=fname, user_lname=lname, user_email=email, user_phone=phone, user_pwd=generate_password_hash(password))
-        db.session.add(user)
-        db.session.commit()
-        flash('Registration successful. Please log in.', 'success')
-        return redirect(url_for('login'))
-    return render_template('user/register.html')
+    return render_template('user/register.html', form=form)
     
 
 
@@ -123,11 +129,13 @@ def new_request():
     deets = User.query.get(userid) 
 
     if request.method == 'POST' and form.validate_on_submit():
-        filename = None
+        filenames = []
         if form.document.data:
-            file = form.document.data
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(UPLOAD_FOLDER, filename))
+            for file in form.document.data:
+                if file:
+                    filename = secure_filename(file.filename)
+                    file.save(os.path.join(UPLOAD_FOLDER, filename))
+                    filenames.append(filename)
 
         new_request = UserRequest(
             fullname=form.fullname.data,
@@ -135,13 +143,14 @@ def new_request():
             job_role=form.job_role.data,
             email_address=form.email.data,
             phone_number=form.phone.data,
+            id_card=form.id_card.data,
             expected_date=form.expected_date.data,
             departure_date=form.departure_date.data,
             duration = (form.departure_date.data - form.expected_date.data).days,
             location=form.location.data,
             purpose=form.purpose.data,
             user_id=userid,
-            document=filename
+            document=json.dumps(filenames) if filenames else None
         )
         db.session.add(new_request)
         db.session.commit()
@@ -174,9 +183,11 @@ def dashboard():
     rejected_requests = db.session.query(UserRequest).filter(UserRequest.user_id==userid, UserRequest.status == ApprovalStatusEnum.REJECTED).count()
     # Get the total number of requests
     total_requests = db.session.query(UserRequest).filter(UserRequest.user_id == userid).count()
+    # Get the list of pending requests
+    pending_requests_list = db.session.query(UserRequest).filter(UserRequest.user_id==userid, UserRequest.status == ApprovalStatusEnum.PENDING).all()
     deets = User.query.get(userid)
     return render_template('user/user_dashboard.html', pending_requests=pending_requests, approved_requests=approved_requests,
-                           rejected_requests=rejected_requests,total_requests=total_requests,deets=deets)
+                           rejected_requests=rejected_requests,total_requests=total_requests, pending_requests_list=pending_requests_list, deets=deets)
 
     
 

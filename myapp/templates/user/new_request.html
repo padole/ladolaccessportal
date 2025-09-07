@@ -11,6 +11,8 @@
 
     <title>User - Dashboard</title>
 
+    <link rel="icon" type="image/png" href="/static/assets/images/ladolsymbol.png">
+
     <!-- Custom fonts for this template-->
     <link href="/static/assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <link
@@ -31,7 +33,7 @@
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
             <!-- Sidebar - Brand -->
-            <a class="navbar-brand" id="logo" href="{{url_for('admin_dashboard')}}"><img src="/static/images/ladol.png" class="img-fluid" id="logo" alt=""></a>
+            <a class="navbar-brand" id="logo" href="{{url_for('admin_dashboard')}}"><img src="/static/assets/images/ladol.png" class="img-fluid" id="logo" alt=""></a>
 
             <!-- <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{url_for('home')}}">
                 <h6 class="sitename">Sisiana's <span id="description-title">Treat</span></h6> 
@@ -220,7 +222,7 @@
                     </div>
                     <div class="col-md-4 mb-5">
                         {{ form.document.label(class="form-label") }}
-                        {{ form.document(class="form-control") }}
+                        {{ form.document(class="form-control", multiple=True) }}
                     </div>
                 </div>
                 <div class="row justify-content-center">

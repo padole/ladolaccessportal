@@ -1,192 +1,380 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>Employee Onboarding System</title>
-    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.css">
-    <link rel="stylesheet" type="text/css" href="/static/fonts/css/all.css">
-    <link rel="stylesheet" href="/static/css/admin.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Karla:ital,wght@0,200..800;1,200..800&family=Madimi+One&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" type="image/png" href="/static/assets/images/ladolsymbol.png">
+    <title>Admin - Dashboard</title>
+
+    <!-- Custom fonts for this template-->
+    <link href="/static/assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="/static/assets/css/admin2.css" rel="stylesheet">
 
 </head>
-<body>
-        <div class="wrapper">
-            <aside id="sidebar">
-                <div class="h-100">
-                    <div class="sidebar-logo my-4">
-                        <a class="navbar-brand" id="logo" href="{{url_for('home')}}">Dip <strong class="logo-text text-light">TEK</strong></a>
-                    </div>
-                    <hr class="sidebar-divider my-0">
-                    <ul class="sidebar-nav">
-                        <li class="sidebar-item my-3">
-                            <a href="{{url_for('admin_dashboard')}}" class="sidebar-link" >
-                                <i class="fa-solid fa-sliders pe-2"></i>
-                                Dashboard
-                            </a>
-                            
-                        </li>
-                        <hr class="sidebar-divider my-0">
-                        <li class="sidebar-item my-3">
-                            <a href="#" class="sidebar-link">
-                                <i class="fa-solid fa-sliders pe-2"></i>
-                                Task
-                            </a>
-                        </li>
-                        <hr class="sidebar-divider my-0">
-                        <li class="sidebar-item my-3">
-                            <a href="{{url_for('admin_users')}}" class="sidebar-link" >
-                                <i class="fa-solid fa-sliders pe-2"></i>
-                                Users
-                            </a>
-                            
-                        </li>
-                    </ul>
-                </div>
-            </aside>
+
+<body id="page-top" >
+        <div id="wrapper">
+        <!-- Sidebar -->
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+            <!-- Sidebar - Brand -->
+            <a class="navbar-brand" id="logo" href="{{url_for('admin_dashboard')}}"><img src="/static/assets/images/ladol.png" class="img-fluid" id="logo" alt=""></a>
+
+            <!-- <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{url_for('home')}}">
+                <h6 class="sitename">Sisiana's <span id="description-title">Treat</span></h6> 
+            </a> -->
+
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
+
+            <!-- Nav Item - Dashboard -->
+            <li class="nav-item active">
+                <a class="nav-link" href="{{url_for('admin_dashboard')}}">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Dashboard</span></a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+
+            <!-- Divider -->
+           
+
+            <li class="nav-item active">
+                <a class="nav-link" href="{{url_for('admin_requests')}}">
+                    <i class="fas fa-fw fa-list"></i>
+                    <span>All Requests</span></a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+            <li class="nav-item active">
+                <a class="nav-link" href="{{url_for('admin_users')}}">
+                    <i class="fas fa-fw fa-users"></i>
+                    <span>Users</span></a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Settings Dropdown -->
+            <li class="nav-item active">
+            <a class="nav-link dropdown-toggle" data-bs-toggle="collapse" href="#settingsDropdown" role="button" aria-expanded="false" aria-controls="settingsDropdown">
+                <i class="fas fa-fw fa-cog"></i>
+                <span>Settings</span></a>
+            </a>
+            <div class="collapse" id="settingsDropdown">
+                <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ms-3">
+                <li>
+                    <a href="{{url_for('admin_change_password')}}" class="nav-link">
+                    <i class="fas fa-fw fa-lock"></i>
+                    <span>Change Password</span> 
+                    </a>
+                </li>
+                
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+                <li>
+                    <a href="{{(url_for('admin_logout'))}}" class="nav-link text-white">
+                    <i class="fas fa-fw fa-power-off"></i>
+                    <span>Logout</span> 
+                    </a>
+                </li>
+                </ul>
+            </div>
+            </li>
+
+        </ul>
+        <!-- End of Sidebar -->
     
-            <div class="main">
-                <nav class="navbar navbar-expand px-3 border-bottom d-flex justify-content-between">
-        
-                    <button class="btn btn-success" type="button" data-bs-theme="dark">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <form
-                            class="d-none d-sm-inline-block form-inline navbar-search">
+            <div id="content-wrapper" class="d-flex flex-column">
+                <div id="content">
+                    <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+                        <!-- Sidebar Toggle (Topbar) -->
+                        <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                            <i class="fa fa-bars"></i>
+                        </button>
+
+                        <!-- Topbar Search -->
+                        <form
+                            class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
                             <div class="input-group">
                                 <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
-                                    aria-label="Search" aria-describedby="basic-addon2">
+                                    aria-label="Search" name="search_query" value="{{ search_query }}" aria-describedby="basic-addon2">
                                 <div class="input-group-append">
-                                    <button class="btn btn-search" type="button">
+                                    <button class="btn btn-primary" type="submit">
                                         <i class="fas fa-search fa-sm"></i>
                                     </button>
                                 </div>
                             </div>
-                    </form>
-                        <div class="d-flex ">
-                          
-                              <a class="nav-link" href="#" id="userDropdown" >
-                                        <span class="d-none d-lg-inline text-gray-600 small">Adole Peter</span>
-                                        <img class="img-profile rounded-circle img-fluid" id="profile-img"
-                                            src="/static/images/undraw_profile.svg">
-                             </a>
+                        </form>
+                    </nav>
+
+                    <div class="container-fluid">
+                        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                            <h1 class="h3 mb-0 text-gray-800">Access Request Details</h1>  
                         </div>
-                </nav>
 
+        <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Personal Information -->
+                        <div class="col-lg-6 col-md-12 mb-4">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-header bg-light">
+                                    <h5 class="mb-0 text-primary"><i class="fas fa-user mx-2"></i>Personal Information</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row g-3">
+                                        <div class="col-12 mb-3">
+                                            <div class="align-items-center">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="text-dark fw-bold "><strong >Full Name:</strong></div>
+                                                    <div class="text-dark mx-2">{{ request.fullname }}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 mb-3">
+                                            <div class="align-items-center">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="text-dark fw-bold "><strong >Email:</strong></div>
+                                                    <div class="text-dark mx-2">{{ request.email_address }}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class=" align-items-center">
+                                                <div class=" d-flex align-items-center">
+                                                    <div class="text-dark fw-bold "><strong >Phone Number:</strong></div>
+                                                    <div class="text-dark mx-2">{{ request.phone_number }}
+                                                </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-<div class="container mt-5">
-    <div class="card shadow-lg">
-        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-            <h4 class="mb-0">Request Details</h4>
-            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-light btn-sm">Back to Dashboard</a>
-        </div>
-        <div class="card-body">
-            <dl class="row">
-                <dt class="col-sm-3">Full Name:</dt>
-                <dd class="col-sm-9">{{ request.fullname }}</dd>
+                        <!-- Job Information -->
+                        <div class="col-lg-6 col-md-12 mb-4">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-header bg-light">
+                                    <h5 class="mb-0 text-primary"><i class="fas fa-briefcase mx-2"></i>Job Information</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row g-3">
+                                        <div class="col-12 mb-3">
+                                            <div class="align-items-center">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="text-dark fw-bold "><strong >Company:</strong></div>
+                                                    <div class="text-dark mx-2">{{ request.company }}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 mb-3">
+                                            <div class="align-items-center">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="text-dark fw-bold "><strong >Job Role:</strong></div>
+                                                    <div class="text-dark mx-2">{{ request.job_role }}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 ">
+                                            <div class="align-items-center">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="text-dark fw-bold "><strong >ID Card Type:</strong></div>
+                                                    <div class="text-dark mx-2">{{ request.id_card.value|capitalize }}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                <dt class="col-sm-3">Company:</dt>
-                <dd class="col-sm-9">{{ request.company }}</dd>
+                    <div class="row">
+                        <!-- Dates and Duration -->
+                        <div class="col-lg-6 col-md-12 mb-4">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-header bg-light">
+                                    <h5 class="mb-0 text-primary"><i class="fas fa-calendar-alt mx-2"></i>Dates & Duration</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row g-3">
+                                        <div class="col-12 mb-3">
+                                            <div class="align-items-center">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="text-dark fw-bold "><strong >Expected Date:</strong></div>
+                                                    <div class="text-dark mx-2">{{ request.expected_date.strftime('%B %d, %Y') }}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 mb-3">
+                                            <div class="align-items-center">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="text-dark fw-bold "><strong >Departure Date:</strong></div>
+                                                    <div class="text-dark mx-2">{{ request.departure_date.strftime('%B %d, %Y') }}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 ">
+                                            <div class="align-items-center">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="text-dark fw-bold "><strong >Duration:</strong></div>
+                                                    <div class="text-dark mx-2">{{ request.duration }} Days</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-                <dt class="col-sm-3">Job Role:</dt>
-                <dd class="col-sm-9">{{ request.job_role }}</dd>
+                        <!-- Purpose and Location -->
+                        <div class="col-lg-6 col-md-12 mb-4">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-header bg-light">
+                                    <h5 class="mb-0 text-primary"><i class="fas fa-map-marker-alt mx-2"></i>Purpose & Location</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row g-3">
+                                        <div class="col-12 mb-3">
+                                            <div class="align-items-center">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="text-dark fw-bold "><strong >Location:</strong></div>
+                                                    <div class="text-dark mx-2">{{ request.location }}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                     <div class="col-12 mb-3">
+                                            <div class="align-items-center">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="text-dark fw-bold "><strong >Purpose of Visit:</strong></div>
+                                                    <div class="text-dark mx-2">{{ request.purpose }}</div>
+                                                </div>
+                                            </div>
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                <dt class="col-sm-3">Email:</dt>
-                <dd class="col-sm-9">{{ request.email_address }}</dd>
+                    <!-- Status and Document -->
+                    <div class="row">
+                        <div class="col-12 mb-4">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-header bg-light">
+                                    <h5 class="mb-0 text-primary"><i class="fas fa-info-circle mx-2"></i>Status & Document</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-6 mb-3">
+                                            <div class="d-flex align-items-center">
+                                                    <!-- <small class="text-muted d-block">Current Status</small> -->
+                                                    <div class="text-dark fw-bold "><strong >Current Status:</strong></div>
+                                                    <div class="text-dark mx-2"> <span class=" badge fs-6 px-2 py-2
+                                                        {% if request.status.name == 'APPROVED' %} bg-success
+                                                        {% elif request.status.name == 'REJECTED' %} bg-danger
+                                                        {% else %} bg-warning text-dark
+                                                        {% endif %}">
+                                                        {{ request.status.value|capitalize }}
+                                                    </span></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            {% if documents %}
+                                            <div class="d-flex align-items-center">
+                                                <div>
+                                                    <div class="text-dark fw-bold "><strong >Attached Documents:</strong></div>
+                                                    {% for doc in documents %}
+                                                    <a href="{{ url_for('static', filename='uploads/' + doc) }}" class="btn btn-outline-success btn-sm me-2" download>
+                                                        <i class="fas fa-download me-1"></i>{{ doc }}
+                                                    </a>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                            {% else %}
+                                            <div class="d-flex align-items-center">
+                                                <div>
+                                                    <div class="text-dark fw-bold "><strong >Attached Documents:</strong></div>
+                                                    <div class="text-dark mx-2">No document uploaded</div>
+                                                </div>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                <dt class="col-sm-3">Phone:</dt>
-                <dd class="col-sm-9">{{ request.phone_number }}</dd>
-
-                <dt class="col-sm-3">ID Card Type:</dt>
-                <dd class="col-sm-9">{{ request.id_card.value|capitalize }}</dd>
-
-                <dt class="col-sm-3">Expected Date:</dt>
-                <dd class="col-sm-9">{{ request.expected_date.strftime('%Y-%m-%d') }}</dd>
-
-                <dt class="col-sm-3">Departure Date:</dt>
-                <dd class="col-sm-9">{{ request.departure_date.strftime('%Y-%m-%d') }}</dd>
-
-                <dt class="col-sm-3">Duration:</dt>
-                <dd class="col-sm-9">{{ request.duration }}</dd>
-
-                <dt class="col-sm-3">Location:</dt>
-                <dd class="col-sm-9">{{ request.location }}</dd>
-
-                <dt class="col-sm-3">Purpose:</dt>
-                <dd class="col-sm-9">{{ request.purpose }}</dd>
-
-                <dt class="col-sm-3">Status:</dt>
-                <dd class="col-sm-9">
-                    <span class="badge 
-                        {% if request.status.name == 'APPROVED' %} bg-success 
-                        {% elif request.status.name == 'REJECTED' %} bg-danger 
-                        {% else %} bg-warning text-dark 
-                        {% endif %}">
-                        {{ request.status.value|capitalize }}
-                    </span>
-                </dd>
-                {% if request.document %}
-                <dt>Attached Document:<dd>
-                    <a href="{{ url_for('static', filename='uploads/' + request.document) }}" class="btn btn-outline-info" download>
-                     Download Document
-                    </a></dd></dt>
-
-                {% else %}
-                <p>No document uploaded.</p>
-                {% endif %}
-            </dl>
-
-            <hr>
-
-            <h5>Update Request Status</h5>
-            <form method="POST" action="{{ url_for('admin_request_details', request_id=request.request_id) }}">
-                {{ form.hidden_tag() }}
-                <div class="d-flex gap-2">
-                    <button type="submit" name="status" value="APPROVED" class="btn btn-success">Approve</button>
-                    <button type="submit" name="status" value="REJECTED" class="btn btn-danger">Reject</button>
-                    <!-- <button type="submit" name="status" value="PENDING" class="btn btn-warning text-dark">Mark Pending</button> -->
+                    <!-- Actions -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-header bg-light">
+                                    <h5 class="mb-0 text-primary"><i class="fas fa-cogs mx-2"></i>Update Request Status</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form method="POST" action="{{ url_for('admin_request_details', request_id=request.request_id) }}">
+                                        {{ form.hidden_tag() }}
+                                        <div class="d-flex gap-3 flex-wrap">
+                                            <button type="submit" name="status" value="APPROVED" class="btn btn-success btn-lg mx-4 px-2">Approve</button>
+                                            <button type="submit" name="status" value="REJECTED" class="btn btn-danger btn-lg px-4"> Reject  </button>
+                                           
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </form>
+            </div>
         </div>
+    </div>
     </div>
 </div>
 
-               {#<!-- <div class=" row mt-4 mx-3">
-                <h2>Request Details</h2>
 
-                        <ul>
-                            <li><strong>Full Name:</strong> {{ request.fullname }}</li>
-                            <li><strong>Company:</strong> {{ request.company }}</li>
-                            <li><strong>Job Role:</strong> {{ request.job_role }}</li>
-                            <li><strong>Email:</strong> {{ request.email_address }}</li>
-                            <li><strong>Phone:</strong> {{ request.phone_number }}</li>
-                            <li><strong>ID Card Type:</strong> {{ request.id_card.value }}</li>
-                            <li><strong>Expected Date:</strong> {{ request.expected_date.strftime('%Y-%m-%d') }}</li>
-                            <li><strong>Departure Date:</strong> {{ request.departure_date.strftime('%Y-%m-%d') }}</li>
-                            <li><strong>Duration:</strong> {{ request.duration }}</li>
-                            <li><strong>Location:</strong> {{ request.location }}</li>
-                            <li><strong>Purpose:</strong> {{ request.purpose }}</li>
-                            <li><strong>Approval Status:</strong> {{ request.status.value }}</li>
-                        </ul>
-
-                        <form method="POST" action="{{ url_for('admin_request_details', request_id=request.request_id) }}">
-                            {{ form.hidden_tag() }}
-                            <button type="submit" name="status" value="APPROVED" class="btn btn-success">Approve</button>
-                            <button type="submit" name="status" value="REJECTED" class="btn btn-danger">Reject</button>
-                            <button type="submit" name="status" value="PENDING" class="btn btn-warning">Mark Pending</button>
-                        </form>
-
-                        <a href="{{ url_for('admin_dashboard') }}">Back to Dashboard</a>
+            <!-- Footer -->
+            <footer class="sticky-footer bg-white">
+                <div class="container my-auto">
+                    <div class="copyright text-center my-auto">
+                        <p>&copy; <span>Copyright</span> <strong class="px-1 sitename">Ladol</strong> <span>All Rights Reserved</span></p>
+                    </div>
+                </div>
+            </footer>
+            <!-- End of Footer -->
 
 
-               </div>           -->#}
-            </div>
-        </div>  
-    <script src="/static/bootstrap/js/bootstrap.bundle.js"></script> 
-    <script src="/static/js/main2.js"></script>   
-    <script src="/static/jquery/main.js"></script>
+</div>
+</div>  
+    
+    <!-- Bootstrap core JavaScript-->
+    <script src="/static/assets/vendor/jquery/jquery.min.js"></script>
+    <script src="/static/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="/static/assets/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="/static/assets/js/sb-admin-2.min.js"></script>
+
     
 </body>
 </html>

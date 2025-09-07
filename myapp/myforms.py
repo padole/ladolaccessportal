@@ -1,7 +1,7 @@
-from flask_wtf import FlaskForm 
+from flask_wtf import FlaskForm
 from wtforms import StringField,EmailField,TextAreaField,SubmitField,PasswordField,SelectField,DateField
 from wtforms.validators import DataRequired,Email,EqualTo,Length
-from flask_wtf.file import FileField, FileAllowed
+from flask_wtf.file import FileField, FileAllowed, MultipleFileField
 from myapp.models import ApprovalStatusEnum
 from datetime import datetime
 
@@ -18,8 +18,8 @@ class LoginForm(FlaskForm):
 
 
 class RegistrationForm(FlaskForm):
-    firstname = StringField('First Name', validators=[DataRequired(message='Please enter your fisrt name')])
-    lastname = StringField('Last Name', validators=[DataRequired(message='Please enter your last name')])
+    fname = StringField('First Name', validators=[DataRequired(message='Please enter your first name')])
+    lname = StringField('Last Name', validators=[DataRequired(message='Please enter your last name')])
     email = EmailField('Email', validators=[DataRequired(message='Enter a valid email address'), Email()])
     phone = StringField('Phone', validators=[DataRequired(message='Enter phone number')])
     password = PasswordField('Password', validators=[DataRequired(message='Enter password'), Length(min=8)])
@@ -54,11 +54,11 @@ class NewRequest(FlaskForm):
     id_card = SelectField(
         "ID Card",
         choices=[
-            ('vistor ID', 'Vistor ID'),
-            ('Parmanent ID', 'Parmanent ID'),
-            ('not applicable', 'not applicable')
+            ('visitor', 'Visitor ID'),
+            ('permanent', 'Permanent ID'),
+            ('not_applicable', 'Not Applicable')
         ],
-        default='Vistor ID',
+        default='visitor',
         validators=[DataRequired()]
     )
     # id_card = SelectField('ID Card', coerce=int)
@@ -78,7 +78,7 @@ class NewRequest(FlaskForm):
     duration = StringField('duration', validators=[DataRequired()])
     location = StringField('location', validators=[DataRequired()])
     purpose = TextAreaField('Purpose of visit', validators=[DataRequired()])
-    document = FileField('Upload Document (PDF only)', validators=[FileAllowed(['pdf'], 'PDFs only!')])
+    document = MultipleFileField('Upload Documents (PDF only)', validators=[FileAllowed(['pdf'], 'PDFs only!')])
 
     submit = SubmitField('Send Request')
 
