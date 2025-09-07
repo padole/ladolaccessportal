@@ -4,14 +4,16 @@ services:
     env: python
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn --bind 0.0.0.0:$PORT myapp:app
-    releaseCommand: flask db upgrade
+    releaseCommand: PYTHONPATH=/opt/render/project/src flask db upgrade
     envVars:
       - key: FLASK_APP
         value: app.py
       - key: FLASK_ENV
         value: production
+      - key: PYTHONPATH
+        value: /opt/render/project/src
       - key: DATABASE_URL
-        sync: false  # Set this to your Render PostgreSQL database URL
+        value: postgresql://ladol_access_portal_user:oGwktdQPGubxyg1gCerZFSkFIWDD4kAY@dpg-d2uv7ivfte5s73bjn7bg-a.oregon-postgres.render.com/ladol_access_portal
       - key: SECRET_KEY
         generateValue: true
       - key: MAIL_SERVER
