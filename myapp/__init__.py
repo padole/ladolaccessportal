@@ -13,6 +13,11 @@ def create_app():
     from myapp.models import db, User, Admin # Import the db instance from SQLALCHEMY
     template_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'templates'))
     app = Flask(__name__, template_folder=template_dir, instance_relative_config=True) # Load config from instance folder
+   
+
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL")
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
 
     
     # app.config.from_object(config.TestConfig)# Load config from class
