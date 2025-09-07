@@ -154,6 +154,21 @@ def new_request():
         )
         db.session.add(new_request)
         db.session.commit()
+
+        # Send email notification to user
+        msg = Message("Access Request Created",
+                      sender=app.config['MAIL_DEFAULT_SENDER'],
+                      recipients=[deets.user_email])
+        msg.body = f"Dear {deets.user_fname},\n\nYour access request has been successfully created.\n\nRequest Details:\n- Visitor's Name: {form.fullname.data}\n- Company: {form.company.data}\n- Location: {form.location.data}\n- Purpose of Visit: {form.purpose.data}\n\nYou will be notified once your request is reviewed by the Access Controller.\n\nBest regards,\nLadol Security Team"
+        mail.send(msg)
+
+        # Send email notification to admin
+        admin_msg = Message("New Access Request Created",
+                            sender=app.config['MAIL_DEFAULT_SENDER'],
+                            recipients=[app.config['MAIL_ADMIN']])
+        admin_msg.body = f"Dear Admin,\n\nA new access request has been created.\n\nRequest Details:\n- Visitor's Name: {form.fullname.data}\n- Company: {form.company.data}\n- Location: {form.location.data}\n- Purpose of Visit: {form.purpose.data}\n- Requested by: {deets.user_fname} {deets.user_lname} ({deets.user_email})\n\nPlease review the request in the admin dashboard.\n\nBest regards,\nLadol Security Team"
+        mail.send(admin_msg)
+
         flash('Request created successfully', 'success')
         return redirect(url_for('user_request'))
     users = User.query.all()

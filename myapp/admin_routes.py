@@ -3,10 +3,10 @@ from flask import render_template,request,redirect,flash,redirect,url_for,sessio
 from functools import wraps
 from werkzeug.security import generate_password_hash,check_password_hash
 from flask_login import login_required, logout_user,current_user, LoginManager,login_user,login_manager
-from myapp import app,myforms,csrf
+from myapp import app,myforms,csrf,mail
 from myapp.myforms import StatusUpdateForm
 from myapp.models import User,Admin,UserRequest,ApprovalStatusEnum,db
-
+from flask_mail import Message
 
 
 
@@ -19,8 +19,6 @@ def nocache(view):
         response.headers["Expires"] = "0"
         return response
     return no_cache
-
-
 
 
 
@@ -83,12 +81,6 @@ def admin_requests():
                 User.user_lname.ilike(f'%{search_query}%')
             )
         )
-    # if date_filter:
-    #     try:
-    #         filter_date = datetime.strptime(date_filter, '%Y-%m-%d').date()
-    #         query = query.filter(UserRequest.expected_date == filter_date)
-    #     except ValueError:
-    #         pass  # Invalid date, ignore
     requests = query.paginate(page=page, per_page=10, error_out=False)
     return render_template('admin/requests.html', requests=requests, status_filter=status_filter or 'all', date_filter=date_filter or '', search_query=search_query)
 
@@ -99,21 +91,50 @@ def admin_request_details(request_id):
     if not session.get('adminuseronline'):
         return redirect(url_for('admin_login'))
     req = UserRequest.query.get_or_404(request_id)
+    users = User.query.all()
     form = StatusUpdateForm()
     if request.method == 'POST':
         new_status = request.form.get('status')
         if new_status and new_status in ApprovalStatusEnum.__members__:
             req.status = ApprovalStatusEnum[new_status]
             db.session.commit()
+
+            # Send email notification to user on approval
             if new_status == 'APPROVED':
-                flash('Access request approved', 'success')
+                email = req.user.user_email
+                name = req.user.user_fname
+                msg = Message("Access Request Approved",
+                              sender=app.config['MAIL_DEFAULT_SENDER'],
+                              recipients=[email])
+                msg.body = f"Dear {name},\n\nYour access request has been approved by the Access Controller.\n\nBest regards,\nLadol Security Team"
+                try:
+                    mail.send(msg)
+                except Exception as e:
+                    app.logger.error(f"Failed to send approval email: {e}")
+                    flash('Access request approved but failed to send email notification.', 'warning')
+                else:
+                    flash('Access request approved', 'success')
             elif new_status == 'REJECTED':
-                flash('Access request rejected', 'danger')
+                email = req.user.user_email
+                name = req.user.user_fname
+                msg = Message("Access Request Rejected",
+                              sender=app.config['MAIL_DEFAULT_SENDER'],
+                              recipients=[email])
+                msg.body = f"Dear {name},\n\nYour access request has been rejected by the Access Controller.\n\nBest regards,\nLadol Security Team"
+                try:
+                    mail.send(msg)
+                except Exception as e:
+                    app.logger.error(f"Failed to send rejection email: {e}")
+                    flash('Access request rejected but failed to send email notification.', 'warning')
+                else:
+                    flash('Access request rejected', 'danger')
             return redirect(url_for('admin_dashboard'))
         else:
             flash('Invalid status update', 'danger')
     documents = json.loads(req.document) if req.document else []
-    return render_template('admin/request_details.html',request=req, form=form, documents=documents)
+    return render_template('admin/request_details.html',request=req, form=form, documents=documents, users=users)
+
+        
 
         
 

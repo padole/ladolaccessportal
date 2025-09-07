@@ -1,6 +1,6 @@
 # Access Request Portal Web Application
 
-This is a Flask-based web application for managing user and admin access portals. It includes user registration, login, password management, and request handling features.
+This is a Flask-based web application for managing user and admin access requests. It includes user registration, login, password management, and request handling features.
 
 ## Features
 
