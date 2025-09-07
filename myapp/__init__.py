@@ -13,8 +13,7 @@ def create_app():
     from myapp.models import db, User, Admin # Import the db instance from SQLALCHEMY
     template_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'templates'))
     app = Flask(__name__, template_folder=template_dir, instance_relative_config=True) # Load config from instance folder
-    
-    app.config.from_pyfile('config.py')
+
     
     # app.config.from_object(config.TestConfig)# Load config from class
     mail.init_app(app)
