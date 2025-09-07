@@ -4,10 +4,10 @@ services:
     env: python
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn --bind 0.0.0.0:$PORT myapp:app
-    releaseCommand: PYTHONPATH=/opt/render/project/src flask db upgrade
+    releaseCommand: cd /opt/render/project/src && PYTHONPATH=/opt/render/project/src FLASK_APP=myapp flask db upgrade
     envVars:
       - key: FLASK_APP
-        value: app.py
+        value: myapp
       - key: FLASK_ENV
         value: production
       - key: PYTHONPATH
