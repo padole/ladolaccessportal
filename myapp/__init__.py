@@ -22,19 +22,12 @@ def create_app():
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     # Flask configuration
-    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'VLVOqS1Hxo9EKlJeOw1aK5ubpY5dBCabXVIpnRDbaNw')
+  
 
     # Email configuration
     app.config['MAIL_SERVER'] = os.environ.get('MAIL_SERVER', 'smtp.office365.com')
     app.config['MAIL_PORT'] = int(os.environ.get('MAIL_PORT', 587))
     app.config['MAIL_USE_TLS'] = os.environ.get('MAIL_USE_TLS', 'True').lower() == 'true'
-    app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME', 'meetings@ladol.com')
-    app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', 'Kah37418')
-    app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER', 'Ladol Access Portal <meetings@ladol.com>')
-    app.config['MAIL_ADMIN'] = os.environ.get('MAIL_ADMIN', 'meetings@ladol.com')
-
-    # In myapp/__init__.py, temporarily add this for debugging:
-    print(f"DATABASE_URL: {os.environ.get('DATABASE_URL', 'NOT SET')}")
 
 
     # app.config.from_object(config.TestConfig)# Load config from class
