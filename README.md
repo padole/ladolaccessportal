@@ -75,4 +75,39 @@ The app will be available at `http://localhost:8082`.
 - Use database migrations to keep the schema up to date.
 - Consider adding a `Procfile` or `Dockerfile` for deployment on platforms like Heroku or Docker containers.
 
+## Deployment on PythonAnywhere
+
+1. Upload your project files to PythonAnywhere, including the entire project directory.
+
+2. Create a virtual environment on PythonAnywhere and install dependencies:
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+3. Set environment variables on PythonAnywhere for:
+
+- `SECRET_KEY`
+- `DATABASE_URL` (e.g., MySQL or PostgreSQL connection string)
+- Email settings: `MAIL_SERVER`, `MAIL_PORT`, `MAIL_USE_TLS`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_DEFAULT_SENDER`
+
+4. Configure the web app on PythonAnywhere:
+
+- Set the WSGI configuration file to point to your `wsgi.py` file.
+- Set the working directory to your project directory.
+- Configure static files mapping to serve `/static/` from the `myapp/static/` folder.
+
+5. Run database migrations on PythonAnywhere:
+
+```bash
+flask db upgrade
+```
+
+6. Reload the web app on PythonAnywhere to apply changes.
+
+7. Your app should now be live on your PythonAnywhere domain.
+
+
 

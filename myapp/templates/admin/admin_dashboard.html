@@ -106,6 +106,9 @@
               </div>
             </div>
           </form>
+          <div class="text-dark font-weight-bold mx-2">
+            Welcome, Admin
+          </div>
         </nav>
         <div class="container-fluid">
           <div class="mb-3">
@@ -119,6 +122,7 @@
           </div>
           <div class="d-sm-flex align-items-center justify-content-between mb-4">
             <h1 class="h3 mb-0 text-gray-800">Admin Dashboard</h1>
+            <h1 class="h3 mb-0 text-gray-800">Total Requests: {{total_requests}}</h1>
           </div>
           <div class="row">
             <div class="col-xl-3 col-md-6 mb-4">
@@ -126,7 +130,7 @@
                 <div class="card-body">
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                      <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Pending request</div>
+                      <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Pending requests</div>
                       <div class="h5 mb-0 font-weight-bold text-gray-800"><h3>{{ pending_requests }}</h3></div>
                     </div>
                     <div class="col-auto">
@@ -141,7 +145,7 @@
                 <div class="card-body">
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                      <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Approved request</div>
+                      <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Approved requests</div>
                       <div class="h5 mb-0 font-weight-bold text-gray-800">{{ approved_requests }}</div>
                     </div>
                     <div class="col-auto">
@@ -152,11 +156,11 @@
               </div>
             </div>
             <div class="col-xl-3 col-md-6 mb-4">
-              <div class="card border-left-danger shadow h-100 py-2">
+              <div class="card border-left-warning shadow h-100 py-2">
                 <div class="card-body">
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                      <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Rejected</div>
+                      <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Rejected Requests</div>
                       <div class="row no-gutters align-items-center">
                         <div class="col-auto">
                           <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">{{rejected_requests}}</div>
@@ -164,22 +168,22 @@
                       </div>
                     </div>
                     <div class="col-auto">
-                      <i class="fas fa-ban fa-2x text-danger"></i>
+                      <i class="fas fa-ban fa-2x text-warning"></i>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
             <div class="col-xl-3 col-md-6 mb-4">
-              <div class="card border-left-warning shadow h-100 py-2">
+              <div class="card border-left-danger shadow h-100 py-2">
                 <div class="card-body">
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                      <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Total</div>
-                      <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_requests }}</div>
+                      <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Terminated Requests</div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">{{ terminated_requests }}</div>
                     </div>
                     <div class="col-auto">
-                      <i class="fas fa-clipboard fa-2x text-warning"></i>
+                      <i class="fas fa-times-circle fa-2x text-danger"></i>
                     </div>
                   </div>
                 </div>
@@ -196,11 +200,11 @@
                                     <thead>
                                         <tr>
                                             <th>S/N</th>
-                                            <th>Fullname</th>
+                                            <th>Request No</th>
+                                            <th>Visitor's Fullname</th>
                                             <th>Company</th>
-                                            <th>Job role</th>
-                                            <th>Expected Date</th>
                                             <th>Departure Date</th>
+                                            <th>Expected Date</th>
                                             <th>Status</th>
                                             <th>Action</th>
                                         </tr>
@@ -209,16 +213,17 @@
                                         {% for request in requests %}
                                         <tr>
                                             <td>{{ loop.index }}</td>
+                                            <td>{{ request.request_no }}</td>
                                             <td>{{request.fullname}}</td>
                                             <td>{{request.company}}</td>
-                                            <td>{{request.job_role}}</td>
                                             <td>{{request.expected_date}}</td>
                                             <td>{{request.departure_date}}</td>
                                             <td>
                                                 <span class="badge text-light
                                                     {% if request.status.name == 'APPROVED' %} bg-success 
-                                                    {% elif request.status.name == 'REJECTED' %} bg-danger 
-                                                    {% else %} bg-warning text-dark 
+                                                    {% elif request.status.name == 'REJECTED' %} bg-warning text-dark
+                                                    {% elif request.status.name == 'TERMINATED' %} bg-danger  
+                                                    {% else %} bg-primary text-dark 
                                                     {% endif %}">
                                                     {{ request.status.value|capitalize }}
                                                 </span>

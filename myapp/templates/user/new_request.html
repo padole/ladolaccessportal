@@ -139,7 +139,7 @@
                 {{form.csrf_token}}
                 <div class="row justify-content-center">
                     <div class="col-md-4 form-group mb-5">
-                        {{form.fullname(class_="form-control",placeholder="Fullname")}}
+                        {{form.fullname(class_="form-control",placeholder="Surname                           Firstname")}}
                         {% for error in form.fullname.errors %}
                         <span class="text-danger">{{error}}</span>
                         {% endfor %}
@@ -279,7 +279,7 @@
                 const end = new Date(departure.value);
         
                 if (!isNaN(start) && !isNaN(end)) {
-                    const diff = (end - start) / (1000 * 60 * 60 * 24);
+                    const diff = (end - start) / (1000 * 60 * 60 * 24) + 1; // +1 to include both start and end dates
                     if (diff >= 0) {
                         duration.value = `${diff} day${diff === 1 ? '' : 's'}`;
                     } else {

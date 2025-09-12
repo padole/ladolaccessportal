@@ -1,10 +1,13 @@
 import os
 import json
+import csv
+from io import StringIO
+from datetime import datetime, timedelta
 from werkzeug.utils import secure_filename
 from functools import wraps
 from flask import render_template,request,redirect,flash,redirect,url_for,session,make_response
 from werkzeug.security import generate_password_hash,check_password_hash
-from flask_login import current_user,login_required
+from flask_login import current_user,login_required,login_user,logout_user
 from flask_mail import Message
 from itsdangerous import URLSafeTimedSerializer
 from wtforms.validators import DataRequired
@@ -56,6 +59,10 @@ def login():
             password = loginform.password.data
             deets = db.session.query(User).filter(User.user_email==email).first()
             if deets and email and deets.check_password(password):
+                if not deets.is_enabled:
+                    flash('Your account has been disabled. Please contact the administrator.', category='danger')
+                    return redirect(url_for('login'))
+                login_user(deets)
                 session['useronline'] = deets.user_id
                 flash('Login Successful',category='success')
                 return redirect(url_for('dashboard'))
@@ -129,59 +136,71 @@ def new_request():
 
     if request.method == 'POST' and form.validate_on_submit():
         filenames = []
-        if form.document.data:
-            for file in form.document.data:
-                if file:
-                    filename = secure_filename(file.filename)
-                    file.save(os.path.join(UPLOAD_FOLDER, filename))
-                    filenames.append(filename)
+        try:
+            if form.document.data:
+                for file in form.document.data:
+                    if file:
+                        filename = secure_filename(file.filename)
+                        file.save(os.path.join(UPLOAD_FOLDER, filename))
+                        filenames.append(filename)
 
-        new_request = UserRequest(
-            fullname=form.fullname.data,
-            company=form.company.data,
-            job_role=form.job_role.data,
-            email_address=form.email.data,
-            phone_number=form.phone.data,
-            id_card=form.id_card.data,
-            expected_date=form.expected_date.data,
-            departure_date=form.departure_date.data,
-            duration = (form.departure_date.data - form.expected_date.data).days,
-            location=form.location.data,
-            purpose=form.purpose.data,
-            user_id=userid,
-            document=json.dumps(filenames) if filenames else None
-        )
-        db.session.add(new_request)
-        db.session.commit()
+            # Generate next request number
+            max_id = db.session.query(db.func.max(UserRequest.request_id)).scalar() or 0
+            request_no = f"LFZ-{str(max_id + 1).zfill(3)}"
 
-        # Send email notification to user
-        msg = Message("Access Request Created",
-                      sender=app.config['MAIL_DEFAULT_SENDER'],
-                      recipients=[deets.user_email])
-        msg.body = f"Dear {deets.user_fname},\n\nYour access request has been successfully created.\n\nRequest Details:\n- Visitor's Name: {form.fullname.data}\n- Company: {form.company.data}\n- Location: {form.location.data}\n- Purpose of Visit: {form.purpose.data}\n\nYou will be notified once your request is reviewed by the Access Controller.\n\nBest regards,\nLadol Security Team"
-        mail.send(msg)
+            new_request = UserRequest(
+                request_no=request_no,
+                fullname=form.fullname.data,
+                company=form.company.data,
+                job_role=form.job_role.data,
+                email_address=form.email.data,
+                phone_number=form.phone.data,
+                id_card=form.id_card.data,
+                expected_date=form.expected_date.data,
+                departure_date=form.departure_date.data,
+                duration=form.duration.data,
+                location=form.location.data,
+                purpose=form.purpose.data,
+                user_id=userid,
+                document=json.dumps(filenames) if filenames else None
+            )
+            db.session.add(new_request)
+            db.session.commit()
 
-        # Send email notification to admin
-        admin_msg = Message("New Access Request Created",
-                            sender=app.config['MAIL_DEFAULT_SENDER'],
-                            recipients=[app.config['MAIL_ADMIN']])
-        admin_msg.body = f"Dear Admin,\n\nA new access request has been created.\n\nRequest Details:\n- Visitor's Name: {form.fullname.data}\n- Company: {form.company.data}\n- Location: {form.location.data}\n- Purpose of Visit: {form.purpose.data}\n- Requested by: {deets.user_fname} {deets.user_lname} ({deets.user_email})\n\nPlease review the request in the admin dashboard.\n\nBest regards,\nLadol Security Team"
-        mail.send(admin_msg)
+            # Send email notification to user
+            try:
+                msg = Message("Access Request Created",
+                              sender=app.config['MAIL_DEFAULT_SENDER'],
+                              recipients=[deets.user_email])
+                msg.body = f"Dear {deets.user_fname},\n\nYour access request has been successfully created.\n\nRequest Details:\n- Visitor's Name: {form.fullname.data}\n- Company: {form.company.data}\n- Location: {form.location.data}\n- Purpose of Visit: {form.purpose.data}\n\nYou will be notified once your request is reviewed by the Access Controller.\n\nBest regards,\nLadol Security Team"
+                mail.send(msg)
+            except Exception as e:
+                app.logger.error(f"Failed to send user email notification: {e}")
 
-        flash('Request created successfully', 'success')
-        return redirect(url_for('user_request'))
+            # Send email notification to admin
+            try:
+                admin_msg = Message("New Access Request Created",
+                                    sender=app.config['MAIL_DEFAULT_SENDER'],
+                                    recipients=[app.config['MAIL_ADMIN']])
+                admin_msg.body = f"Dear Admin,\n\nA new access request has been created.\n\nRequest Details:\n- Visitor's Name: {form.fullname.data}\n- Company: {form.company.data}\n- Location: {form.location.data}\n- Purpose of Visit: {form.purpose.data}\n- Requested by: {deets.user_fname} {deets.user_lname} ({deets.user_email})\n\nPlease review the request in the admin dashboard.\n\nBest regards,\nLadol Security Team"
+                mail.send(admin_msg)
+            except Exception as e:
+                app.logger.error(f"Failed to send admin email notification: {e}")
+
+            flash('Request created successfully', 'success')
+            return redirect(url_for('user_request'))
+        except Exception as e:
+            db.session.rollback()
+            app.logger.error(f"Error creating new request: {e}")
+            flash('An error occurred while creating the request. Please try again.', 'danger')
+            return redirect(url_for('new_request'))
     users = User.query.all()
     return render_template('user/new_request.html', form=form, users=users, deets=deets)
         
 
 
 
-@app.route('/contact/',methods=['GET','POST'])
-def contact():
-    contactform = myforms.ContactForm()
-    if contactform.validate_on_submit():
-        return redirect('/contact/')
-    return render_template('user/contact.html',contactform=contactform)
+# 
 
 @app.route('/user/dashboad/')
 @nocache
@@ -195,47 +214,124 @@ def dashboard():
     pending_requests = db.session.query(UserRequest).filter(UserRequest.user_id==userid, UserRequest.status == ApprovalStatusEnum.PENDING).count()
     approved_requests = db.session.query(UserRequest).filter(UserRequest.user_id==userid, UserRequest.status == ApprovalStatusEnum.APPROVED).count()
     rejected_requests = db.session.query(UserRequest).filter(UserRequest.user_id==userid, UserRequest.status == ApprovalStatusEnum.REJECTED).count()
+    terminated_requests = db.session.query(UserRequest).filter(UserRequest.user_id==userid, UserRequest.status == ApprovalStatusEnum.TERMINATED).count()
     # Get the total number of requests
     total_requests = db.session.query(UserRequest).filter(UserRequest.user_id == userid).count()
     # Get the list of pending requests
     pending_requests_list = db.session.query(UserRequest).filter(UserRequest.user_id==userid, UserRequest.status == ApprovalStatusEnum.PENDING).all()
     deets = User.query.get(userid)
     return render_template('user/user_dashboard.html', pending_requests=pending_requests, approved_requests=approved_requests,
-                           rejected_requests=rejected_requests,total_requests=total_requests, pending_requests_list=pending_requests_list, deets=deets)
+                           rejected_requests=rejected_requests, terminated_requests=terminated_requests,total_requests=total_requests, pending_requests_list=pending_requests_list, deets=deets)
 
     
 
 @app.route('/user/request/')
 @nocache
 def user_request():
-    # requests = Request.query.filter_by(user_id=user_id).all()
     userid = session.get("useronline")
     if not userid:
         flash('Please log in first', 'danger')
         return redirect(url_for('login'))
 
+    status_filter = request.args.get('status_filter') or ''
+    start_date = request.args.get('start_date') or ''
+    end_date = request.args.get('end_date') or ''
+    search_query = request.args.get('search_query') or ''
     page = request.args.get('page', 1, type=int)
-    per_page = 10  # Number of requests per page
+    per_page = 10
 
-    if userid:
-        pagination = UserRequest.query.filter_by(user_id=userid).paginate(page=page, per_page=per_page, error_out=False)
-        requests = pagination.items
-        deets = User.query.get(userid)
-    else:
-        requests = []
-        deets = None
-        pagination = None
-    # return 'Done'
-    return render_template('user/user_requests.html',deets=deets,requests=requests, pagination=pagination)
+    query = UserRequest.query.filter_by(user_id=userid)
+    if status_filter and status_filter != 'all' and status_filter in ApprovalStatusEnum.__members__:
+        query = query.filter(UserRequest.status == ApprovalStatusEnum[status_filter])
+    if search_query:
+        query = query.filter(
+            db.or_(
+                UserRequest.fullname.ilike(f'%{search_query}%'),
+                UserRequest.company.ilike(f'%{search_query}%'),
+                UserRequest.job_role.ilike(f'%{search_query}%')
+            )
+        )
+    if start_date:
+        try:
+            start_date_obj = datetime.strptime(start_date, '%Y-%m-%d')
+            query = query.filter(UserRequest.created_date >= start_date_obj)
+        except ValueError:
+            pass
+    if end_date:
+        try:
+            end_date_obj = datetime.strptime(end_date, '%Y-%m-%d') + timedelta(days=1)
+            query = query.filter(UserRequest.created_date < end_date_obj)
+        except ValueError:
+            pass
+
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+    deets = User.query.get(userid)
+    return render_template('user/user_requests.html', deets=deets, requests=pagination, status_filter=status_filter or 'all', start_date=start_date, end_date=end_date, search_query=search_query)
 
 
+@app.route('/user/request/export/')
+@nocache
+def user_requests_export():
+    userid = session.get("useronline")
+    if not userid:
+        flash('Please log in first', 'danger')
+        return redirect(url_for('login'))
 
+    status_filter = request.args.get('status_filter') or ''
+    start_date = request.args.get('start_date') or ''
+    end_date = request.args.get('end_date') or ''
+    search_query = request.args.get('search_query') or ''
 
+    query = UserRequest.query.filter_by(user_id=userid)
+    if status_filter and status_filter != 'all' and status_filter in ApprovalStatusEnum.__members__:
+        query = query.filter(UserRequest.status == ApprovalStatusEnum[status_filter])
+    if search_query:
+        query = query.filter(
+            db.or_(
+                UserRequest.fullname.ilike(f'%{search_query}%'),
+                UserRequest.company.ilike(f'%{search_query}%'),
+                UserRequest.job_role.ilike(f'%{search_query}%')
+            )
+        )
+    if start_date:
+        try:
+            start_date_obj = datetime.strptime(start_date, '%Y-%m-%d')
+            query = query.filter(UserRequest.created_date >= start_date_obj)
+        except ValueError:
+            pass
+    if end_date:
+        try:
+            end_date_obj = datetime.strptime(end_date, '%Y-%m-%d') + timedelta(days=1)
+            query = query.filter(UserRequest.created_date < end_date_obj)
+        except ValueError:
+            pass
+
+    requests = query.all()
+
+    si = StringIO()
+    cw = csv.writer(si)
+    cw.writerow(['Request No', 'Visitor\'s Name', 'Job Role', 'Expected Date', 'Departure Date', 'Created Date', 'Status'])
+    for req in requests:
+        cw.writerow([
+            req.request_no,
+            req.fullname,
+            req.job_role,
+            req.expected_date,
+            req.departure_date,
+            req.created_date,
+            req.status.value if req.status else ''
+        ])
+
+    output = make_response(si.getvalue())
+    output.headers["Content-Disposition"] = "attachment; filename=user_requests_export.csv"
+    output.headers["Content-type"] = "text/csv"
+    return output
 
 
 @app.route('/logout/')
 @nocache
 def logout():
+    logout_user()
     if session.get('useronline') != None:
         session.pop('useronline', None)
     return redirect(url_for('home'))

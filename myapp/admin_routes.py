@@ -1,4 +1,7 @@
 import json
+import csv
+from io import StringIO
+from datetime import datetime, timedelta
 from flask import render_template,request,redirect,flash,redirect,url_for,session,make_response
 from functools import wraps
 from werkzeug.security import generate_password_hash,check_password_hash
@@ -30,12 +33,13 @@ def admin_dashboard():
     pending_requests = db.session.query(UserRequest).filter(UserRequest.status == ApprovalStatusEnum.PENDING).count()
     approved_requests = db.session.query(UserRequest).filter(UserRequest.status == ApprovalStatusEnum.APPROVED).count()
     rejected_requests = db.session.query(UserRequest).filter(UserRequest.status == ApprovalStatusEnum.REJECTED).count()
+    terminated_requests = db.session.query(UserRequest).filter(UserRequest.status == ApprovalStatusEnum.TERMINATED).count()
     admin_pending_requests = db.session.query(UserRequest).filter(UserRequest.status == ApprovalStatusEnum.PENDING).all()
     # Get the total number of requests
     total_requests = db.session.query(UserRequest).count()
     return render_template('admin/admin_dashboard.html', pending_requests=pending_requests,
                            approved_requests=approved_requests,rejected_requests=rejected_requests,
-                           total_requests=total_requests, requests=admin_pending_requests)
+                           terminated_requests=terminated_requests, total_requests=total_requests, requests=admin_pending_requests)
 
 
 @app.route('/admin/users/')
@@ -47,7 +51,17 @@ def admin_users():
     return render_template('admin/users.html',users=users)
 
 
-@app.route('/admin/users/remove/<int:user_id>', methods=['POST'])
+@app.route('/admin/userdetails/<int:user_id>/')
+@nocache
+def admin_user_details(user_id):
+    if not session.get('adminuseronline'):
+        return redirect(url_for('admin_login'))
+    user = User.query.get_or_404(user_id)
+    requests = UserRequest.query.filter_by(user_id=user_id).all()
+    return render_template('admin/user_details.html', user=user, requests=requests)
+
+
+@app.route('/admin/users/remove/<int:user_id>/', methods=['POST'])
 @nocache
 def admin_remove_user(user_id):
     if not session.get('adminuseronline'):
@@ -59,13 +73,27 @@ def admin_remove_user(user_id):
     return redirect(url_for('admin_users'))
 
 
+@app.route('/admin/users/toggle/<int:user_id>/', methods=['POST'])
+@nocache
+def admin_toggle_user(user_id):
+    if not session.get('adminuseronline'):
+        return redirect(url_for('admin_login'))
+    user = User.query.get_or_404(user_id)
+    user.is_enabled = not user.is_enabled
+    db.session.commit()
+    status = 'enabled' if user.is_enabled else 'disabled'
+    flash(f'User {user.user_fname} {user.user_lname} has been {status}', 'success')
+    return redirect(url_for('admin_users'))
+
+
 @app.route('/admin/request/')
 @nocache
 def admin_requests():
     if not session.get('adminuseronline'):
         return redirect(url_for('admin_login'))
     status_filter = request.args.get('status_filter') or ''
-    date_filter = request.args.get('date_filter') or ''
+    start_date = request.args.get('start_date') or ''
+    end_date = request.args.get('end_date') or ''
     search_query = request.args.get('search_query') or ''
     page = request.args.get('page', 1, type=int)
     query = UserRequest.query.options(db.joinedload(UserRequest.user)).join(User)
@@ -81,8 +109,80 @@ def admin_requests():
                 User.user_lname.ilike(f'%{search_query}%')
             )
         )
+    if start_date:
+        try:
+            start_date_obj = datetime.strptime(start_date, '%Y-%m-%d')
+            query = query.filter(UserRequest.created_date >= start_date_obj)
+        except ValueError:
+            pass
+    if end_date:
+        try:
+            end_date_obj = datetime.strptime(end_date, '%Y-%m-%d') + timedelta(days=1)
+            query = query.filter(UserRequest.created_date < end_date_obj)
+        except ValueError:
+            pass
     requests = query.paginate(page=page, per_page=10, error_out=False)
-    return render_template('admin/requests.html', requests=requests, status_filter=status_filter or 'all', date_filter=date_filter or '', search_query=search_query)
+    return render_template('admin/requests.html', requests=requests, status_filter=status_filter or 'all', start_date=start_date, end_date=end_date, search_query=search_query)
+
+
+@app.route('/admin/request/export/')
+@nocache
+def admin_requests_export():
+    if not session.get('adminuseronline'):
+        return redirect(url_for('admin_login'))
+
+    status_filter = request.args.get('status_filter') or ''
+    start_date = request.args.get('start_date') or ''
+    end_date = request.args.get('end_date') or ''
+    search_query = request.args.get('search_query') or ''
+
+    query = UserRequest.query.options(db.joinedload(UserRequest.user)).join(User)
+    if status_filter and status_filter != 'all' and status_filter in ApprovalStatusEnum.__members__:
+        query = query.filter(UserRequest.status == ApprovalStatusEnum[status_filter])
+    if search_query:
+        query = query.filter(
+            db.or_(
+                UserRequest.fullname.ilike(f'%{search_query}%'),
+                UserRequest.company.ilike(f'%{search_query}%'),
+                UserRequest.job_role.ilike(f'%{search_query}%'),
+                User.user_fname.ilike(f'%{search_query}%'),
+                User.user_lname.ilike(f'%{search_query}%')
+            )
+        )
+    if start_date:
+        try:
+            start_date_obj = datetime.strptime(start_date, '%Y-%m-%d')
+            query = query.filter(UserRequest.created_date >= start_date_obj)
+        except ValueError:
+            pass
+    if end_date:
+        try:
+            end_date_obj = datetime.strptime(end_date, '%Y-%m-%d') + timedelta(days=1)
+            query = query.filter(UserRequest.created_date < end_date_obj)
+        except ValueError:
+            pass
+
+    requests = query.all()
+
+    si = StringIO()
+    cw = csv.writer(si)
+    # Write header
+    cw.writerow(['Request No', 'Visitor\'s Name', 'Expected Date', 'Departure Date', 'Created Date', 'Requested By', 'Status'])
+    for req in requests:
+        cw.writerow([
+            req.request_no,
+            req.fullname,
+            req.expected_date,
+            req.departure_date,
+            req.created_date,
+            f"{req.user.user_fname} {req.user.user_lname}" if req.user else '',
+            req.status.value if req.status else ''
+        ])
+
+    output = make_response(si.getvalue())
+    output.headers["Content-Disposition"] = "attachment; filename=requests_export.csv"
+    output.headers["Content-type"] = "text/csv"
+    return output
 
 
 @app.route('/admin/requestdetails/<int:request_id>/',methods=['GET','POST'])
@@ -128,6 +228,20 @@ def admin_request_details(request_id):
                     flash('Access request rejected but failed to send email notification.', 'warning')
                 else:
                     flash('Access request rejected', 'danger')
+            elif new_status == 'TERMINATED':
+                email = req.user.user_email
+                name = req.user.user_fname
+                msg = Message("Access Request Terminated",
+                              sender=app.config['MAIL_DEFAULT_SENDER'],
+                              recipients=[email])
+                msg.body = f"Dear {name},\n\nYour access request has been terminated by the Access Controller.\n\nBest regards,\nLadol Security Team"
+                try:
+                    mail.send(msg)
+                except Exception as e:
+                    app.logger.error(f"Failed to send termination email: {e}")
+                    flash('Access request terminated but failed to send email notification.', 'warning')
+                else:
+                    flash('Access request terminated', 'info')
             return redirect(url_for('admin_dashboard'))
         else:
             flash('Invalid status update', 'danger')
@@ -154,6 +268,7 @@ def admin_login():
             stored_pass = check.admin_password
             chk = check_password_hash(stored_pass, password)
             if chk:
+                login_user(check)
                 session['adminuseronline'] = check.admin_id
                 return redirect('/admin/dashboard/')
             else:
@@ -167,6 +282,7 @@ def admin_login():
 @app.route('/admin/logout/')
 @nocache
 def admin_logout():
+    logout_user()
     session.clear()
     return redirect(url_for('admin_login'))
 

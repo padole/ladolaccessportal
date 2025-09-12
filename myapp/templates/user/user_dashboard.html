@@ -140,7 +140,7 @@
                 <div class="card-body">
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                      <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Pending request</div>
+                      <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Pending requests</div>
                       <div class="h5 mb-0 font-weight-bold text-gray-800"><h3>{{ pending_requests }}</h3></div>
                     </div>
                     <div class="col-auto">
@@ -155,7 +155,7 @@
                 <div class="card-body">
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                      <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Approved request</div>
+                      <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Approved requests</div>
                       <div class="h5 mb-0 font-weight-bold text-gray-800">{{ approved_requests }}</div>
                     </div>
                     <div class="col-auto">
@@ -166,11 +166,11 @@
               </div>
             </div>
             <div class="col-xl-3 col-md-6 mb-4">
-              <div class="card border-left-danger shadow h-100 py-2">
+              <div class="card border-left-warning shadow h-100 py-2">
                 <div class="card-body">
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                      <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Rejected</div>
+                      <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Rejected Requests</div>
                       <div class="row no-gutters align-items-center">
                         <div class="col-auto">
                           <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">{{rejected_requests}}</div>
@@ -178,22 +178,22 @@
                       </div>
                     </div>
                     <div class="col-auto">
-                      <i class="fas fa-ban fa-2x text-danger"></i>
+                      <i class="fas fa-ban fa-2x text-warning"></i>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
             <div class="col-xl-3 col-md-6 mb-4">
-              <div class="card border-left-warning shadow h-100 py-2">
+              <div class="card border-left-danger shadow h-100 py-2">
                 <div class="card-body">
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                      <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Total</div>
-                      <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_requests }}</div>
+                      <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Terminated Requests</div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">{{ terminated_requests }}</div>
                     </div>
                     <div class="col-auto">
-                      <i class="fas fa-clipboard fa-2x text-warning"></i>
+                      <i class="fas fa-times-circle fa-2x text-danger"></i>
                     </div>
                   </div>
                 </div>
@@ -232,7 +232,7 @@
                           <td>{{ request.expected_date }}</td>
                           <td>{{ request.departure_date }}</td>
                           <td>
-                            <span class="badge bg-warning text-dark">Pending</span>
+                            <span class="badge bg-primary text-light">Pending</span>
                           </td>
                         </tr>
 

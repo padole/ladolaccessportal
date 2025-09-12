@@ -13,31 +13,28 @@ def create_app():
     from myapp.models import db, User, Admin # Import the db instance from SQLALCHEMY
     template_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'templates'))
     app = Flask(__name__, template_folder=template_dir, instance_relative_config=True) # Load config from instance folder
+    app.instance_path = os.path.join(os.path.dirname(__file__), '..', 'instance')
 
     # Database configuration
     database_url = os.environ.get("DATABASE_URL")
     if not database_url:
-        raise ValueError("DATABASE_URL environment variable is required but not set.")
-    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-    # Flask configuration
-    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'VLVOqS1Hxo9EKlJeOw1aK5ubpY5dBCabXVIpnRDbaNw')
-
-    # Email configuration
-    app.config['MAIL_SERVER'] = os.environ.get('MAIL_SERVER', 'smtp.office365.com')
-    app.config['MAIL_PORT'] = int(os.environ.get('MAIL_PORT', 587))
-    app.config['MAIL_USE_TLS'] = os.environ.get('MAIL_USE_TLS', 'True').lower() == 'true'
-    app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME', 'meetings@ladol.com')
-    app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', 'Kah37418')
-    app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER', 'Ladol Access Portal <meetings@ladol.com>')
-    app.config['MAIL_ADMIN'] = os.environ.get('MAIL_ADMIN', 'meetings@ladol.com')
-
-    # In myapp/__init__.py, temporarily add this for debugging:
-    print(f"DATABASE_URL: {os.environ.get('DATABASE_URL', 'NOT SET')}")
+        # Load config from instance/config.py if DATABASE_URL is not set
+        try:
+            app.config.from_pyfile('config.py')
+        except FileNotFoundError:
+            # If config.py not found, use default or environment variables
+            app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('SQLALCHEMY_DATABASE_URI', 'sqlite:///default.db')
+            app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    else:
+        app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+        app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 
-    # app.config.from_object(config.TestConfig)# Load config from class
+
+   
+
+
+    
     mail.init_app(app)
     csrf.init_app(app)
     db.init_app(app)

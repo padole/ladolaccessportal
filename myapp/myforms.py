@@ -54,11 +54,11 @@ class NewRequest(FlaskForm):
     id_card = SelectField(
         "ID Card",
         choices=[
+            ('id_type', 'ID Card Type'),
             ('visitor', 'Visitor ID'),
             ('permanent', 'Permanent ID'),
-            ('not_applicable', 'Not Applicable')
         ],
-        default='visitor',
+        default='id_type',
         validators=[DataRequired()]
     )
     # id_card = SelectField('ID Card', coerce=int)
@@ -76,9 +76,9 @@ class NewRequest(FlaskForm):
     expected_date = DateField('Expected Date', format='%Y-%m-%d', validators=[DataRequired()])
     departure_date = DateField('Departure Date', format='%Y-%m-%d', validators=[DataRequired()])
     duration = StringField('duration', validators=[DataRequired()])
-    location = StringField('location', validators=[DataRequired()])
+    location = StringField('location')
     purpose = TextAreaField('Purpose of visit', validators=[DataRequired()])
-    document = MultipleFileField('Upload Documents (PDF only)', validators=[FileAllowed(['pdf'], 'PDFs only!')])
+    document = MultipleFileField('Upload Documents', validators=[FileAllowed(['pdf','png','jpg','jpeg'], 'Only PDF and image files are allowed!')])
 
     submit = SubmitField('Send Request')
 
@@ -90,53 +90,13 @@ class StatusUpdateForm(FlaskForm):
     )
     update = SubmitField('Submit')
 
-# class UpdateTask(FlaskForm):
-#     task_name = StringField('Task Name', render_kw={'readonly': True, 'class': 'form-control'}, validators=[DataRequired()])
-#     task_description = TextAreaField('Task Description', render_kw={'readonly': True, 'class': 'form-control'}, validators=[DataRequired()])
-#     user_id = SelectField('Assigned User', render_kw={'disabled': True, 'class': 'form-control'}, coerce=int)
-#     task_status = SelectField(
-#         "Task Status",
-#         choices=[
-#             ('pending', 'pending'),
-#             ('assigned', 'assigned'),
-#             ('Completed', 'Completed')
-#         ],
-#         default='Not Started',
-#         validators=[DataRequired()],
-#     )
-    
+
     start_date = DateField('Start Date', render_kw={'readonly': True, 'class': 'form-control'}, format='%Y-%m-%d', validators=[DataRequired()], default=datetime.today)
     end_date = DateField('End Date', render_kw={'readonly': True, 'class': 'form-control'}, format='%Y-%m-%d', validators=[DataRequired()])
     submit = SubmitField('Create Task')
 
 
-# class UpdateTask(FlaskForm):
-#     taskname = StringField('Task Name',  render_kw={'readonly': True, 'class': 'form-control'}, validators=[DataRequired()])
-#     taskdescription = TextAreaField('Task Description', render_kw={'readonly': True, 'class': 'form-control'}, validators=[DataRequired()])
-#     user_id = SelectField('Assigned User', render_kw={'readonly': True, 'class': 'form-control'}, coerce=int)
-#     taskstatus = SelectField(
-#         "Task Status",
-#         choices=[
-#             ('pending', 'pending'),
-#             ('assigned', 'assigned'),
-#             ('Completed', 'Completed')
-#         ],
-#         default='Not Started',
-#         validators=[DataRequired()],
-        
-#     )
-#     start_date = DateField('Start Date', render_kw={'readonly': True, 'class': 'form-control'}, format='%Y-%m-%d', validators=[DataRequired()],default=datetime.today)
-#     end_date = DateField('End Date', render_kw={'readonly': True, 'class': 'form-control'}, format='%Y-%m-%d', validators=[DataRequired()])
-#     submit = SubmitField('Create Task')
 
-# class UpdateTask(FlaskForm):
-#     taskname = StringField('Task Name', validators=[DataRequired()])
-#     taskdescription = TextAreaField('Task Description', validators=[DataRequired()])
-   
-#     submit = SubmitField('Update Task')
-
-# class DeleteTask(FlaskForm):
-#     submit = SubmitField('Delete Task')
 
 
 

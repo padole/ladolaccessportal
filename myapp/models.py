@@ -18,6 +18,7 @@ class ApprovalStatusEnum(Enum):
     PENDING = 'PENDING'
     APPROVED = 'APPROVED'
     REJECTED = 'REJECTED'
+    TERMINATED = 'TERMINATED'
 
 
 
@@ -30,6 +31,10 @@ class User(UserMixin, db.Model):
     user_phone = db.Column(db.String(100), nullable=False)
     user_email = db.Column(db.String(100), nullable=False, unique=True)
     user_pwd = db.Column(db.String(200))
+    is_enabled = db.Column(db.Boolean, nullable=False, default=True)
+
+    def get_id(self):
+        return str(self.user_id)
 
     def set_password(self, password):
         self.user_pwd = generate_password_hash(password)
@@ -37,17 +42,22 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.user_pwd, password)
     
+    
 
-class Admin(db.Model):
+class Admin(UserMixin, db.Model):
     admin_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     admin_username = db.Column(db.String(100),nullable=False)
     admin_password = db.Column(db.String(200),nullable=False)
     admin_loggedin = db.Column(db.DateTime, default=datetime.utcnow)
 
+    def get_id(self):
+        return str(self.admin_id)
+
 
 
 class UserRequest(db.Model):
     request_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    request_no = db.Column(db.String(20), unique=True, nullable=False)
     fullname = db.Column(db.String(200), nullable=False)
     company = db.Column(db.String(200), nullable=False)
     job_role = db.Column(db.String(200), nullable=False)
@@ -63,6 +73,7 @@ class UserRequest(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
     user = db.relationship('User', backref='requests')
     document = db.Column(db.String(255))
+    created_date = db.Column(db.DateTime, default=datetime.utcnow)
 
 
 
