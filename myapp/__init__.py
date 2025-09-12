@@ -28,6 +28,11 @@ def create_app():
     else:
         app.config['SQLALCHEMY_DATABASE_URI'] = database_url
         app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+        raise ValueError("DATABASE_URL environment variable is required but not set.")
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+
 
 
 
